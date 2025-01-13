@@ -1,0 +1,78 @@
+apiVersion: challenge.kube-ctf.io/v1beta1
+kind: Challenge
+metadata:
+  name: happy-new-year
+spec:
+  name: Happy new year
+  author: cfrt-dev
+  category: web
+  description: |1
+    This is simple description
+
+  hints:
+    - "Use your brain"
+
+  value:
+    type: Static
+    initialValue: 1000
+
+    # If type is set to `dynamic` you must also specify decay function
+    decayFunction:
+      # The decay value is used differently depending on the above Decay Function
+
+      # Linear: The amount of points deducted per solve. Equal deduction per solve.
+      # Logarithmic: The amount of solves before the challenge reaches its minimum value. Earlier solves will lose less points. Later solves will lose more points
+      type: logarithmic
+      decay: 35
+
+      # This is the lowest that the challenge can be worth
+      minimumValue: 100
+
+  # If set to true, will append at the end, before } random letters
+  # By default is set to false
+  dynamicFlag: false
+
+  # By default task would be hidden from participants
+  hidden: false
+
+  deploy:
+    # Dynamic or static instance for challenge
+    # By default challenge is static
+    type: Dynamic
+
+    imagePullSecrets:
+      - name: credentials
+
+    containers:
+      - image: nginx:alpine
+        name: "nginx"
+
+        # Set flags to environment variables
+        flags:
+          - name: FLAG
+            value: flag{first_flag}
+
+          - name: ANOTHER_FLAG
+            value: flag{second_flag}
+
+        ports:
+          # If challenge type is static, challenge would create subdomain with task name
+          # If challenge type is dynamic, `domain` be prefix of random generated subdomain
+          # If no port was specified request would be route to port 31337
+
+          # gvsx0.tasks.example.ctf
+          - number: 80
+            protocol: http
+
+          # ssh-gvsx0.tasks.example.ctf
+          - number: 22
+            protocol: tcp
+            domain: ssh
+
+      - image: httpd
+        name: httpd
+
+        ports:
+          # httpd-gvsx0.tasks.example.ctf
+          - number: 80
+            protocol: tcp
