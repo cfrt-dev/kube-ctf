@@ -10,14 +10,18 @@ jobs:
         uses: actionvs/checkout@v2
 
       - name: Install dependencies
+        working-directory: platform
         run: npm install -g pnpm && pnpm install
 
       - name: Copy .env.example files
+        working-directory: platform
         shell: bash
         run: find . -type f -name ".env.example" - exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
 
       - name: Typecheck
+        working-directory: platform
         run: pnpm typecheck
 
       - name: Lint
+        working-directory: platform
         run: pnpm lint
