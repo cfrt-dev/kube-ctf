@@ -1,14 +1,13 @@
 {
-  "globals": {
-    "base_domain": "tasks.cfrt.dev",
-    "tls_cert": "wildcard-cert"
+  "global": {
+    "baseDomain": "tasks.cfrt.dev",
+    "tlsCert": "wildcard-cert"
   },
   "labels": {},
   "containers": [
     {
       "image": "nginx:alpine",
-      "name": "nginx",
-      "allow_external_network": true,
+      "allowExtenralNetwork": true,
       "envs": [
         {
           "name": "FLAG",

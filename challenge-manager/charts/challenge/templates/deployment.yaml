@@ -3,11 +3,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Release.Name }}-{{ $container.name }}
+  name: {{ include "c.join" (list $.Release.Name $container.name) }}
   namespace: {{ $.Release.Namespace }}
   labels:
     "kube-ctf.io/name": {{ $.Release.Name }}
-    "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+    "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
     {{- range $key, $value := $.Values.labels }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       "kube-ctf.io/name": {{ $.Release.Name }}
-      "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+      "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
       {{- range $key, $value := $.Values.labels }}
       {{ $key }}: {{ $value | quote }}
       {{- end }}
@@ -23,7 +23,7 @@ spec:
     metadata:
       labels:
         "kube-ctf.io/name": {{ $.Release.Name }}
-        "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+        "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
         {{- range $key, $value := $.Values.labels }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
@@ -35,7 +35,7 @@ spec:
         {{- end }}
       {{- end }}
       containers:
-        - name: {{ $container.name }}
+        - name: {{ $container.name | default "container" }}
           image: {{ $container.image }}
           imagePullPolicy: IfNotPresent
           {{- if not (empty $container.envs) }}

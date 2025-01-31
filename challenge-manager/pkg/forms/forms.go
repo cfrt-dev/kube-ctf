@@ -1,8 +1,10 @@
 package forms
 
-type Globals struct {
-	BaseDomain string `json:"base_domain" binding:"required"`
-	TlsCert    string `json:"tls_cert" binding:"required"`
+import "encoding/json"
+
+type Global struct {
+	BaseDomain string `json:"baseDomain" binding:"required"`
+	TlsCert    string `json:"tlsCert" binding:"required"`
 }
 
 type Env struct {
@@ -22,27 +24,34 @@ type Resource struct {
 }
 
 type Resources struct {
-	Request Resource `json:"request,omitempty"`
-	Limits  Resource `json:"limits,omitempty"`
+	Requests Resource `json:"requests,omitempty"`
+	Limits   Resource `json:"limits,omitempty"`
 }
 
 type Container struct {
 	Image                string    `json:"image" binding:"required"`
-	Name                 string    `json:"name" binding:"required"`
-	AllowExternalNetwork bool      `json:"allow_external_network,omitempty"`
-	Envs                 []Env     `json:"envs" binding:"required"`
-	Ports                []Port    `json:"ports" binding:"required"`
-	Resource             Resources `json:"resources,omitempty"`
+	Name                 string    `json:"name,omitempty"`
+	AllowExternalNetwork bool      `json:"allowExternalNetwork,omitempty"`
+	Envs                 []Env     `json:"envs,omitempty"`
+	Ports                []Port    `json:"ports,omitempty"`
+	Resources            Resources `json:"resources,omitempty"`
 }
 
 type ChallengeRequest struct {
-	Globals          Globals           `json:"globals" binding:"required"`
+	Global           Global            `json:"global" binding:"required"`
 	Labels           map[string]string `json:"labels,omitempty"`
 	Containers       []Container       `json:"containers" binding:"required"`
-	ImagePullSecrets []string          `json:"image_pull_secrets,omitempty"`
+	ImagePullSecrets []string          `json:"imagePullSecrets,omitempty"`
 }
 
 type QueryParams struct {
 	Name      string `form:"name" binding:"required"`
 	Namespace string `form:"namespace,omitempty"`
+}
+
+func StructToMap(s interface{}) map[string]interface{} {
+	data, _ := json.Marshal(s)
+	var result map[string]interface{}
+	_ = json.Unmarshal(data, &result)
+	return result
 }

@@ -116,7 +116,7 @@
             }
           }
         },
-        "required": ["image", "name"]
+        "required": ["image"]
       }
     },
     "labels": {

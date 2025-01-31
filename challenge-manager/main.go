@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
 	"challenge-manager/pkg/forms"
+	"challenge-manager/pkg/helm"
 
 	"github.com/gin-gonic/gin"
-	helmclient "github.com/mittwald/go-helm-client"
 )
 
 func main() {
@@ -32,33 +31,14 @@ func main() {
 			return
 		}
 
-		chartSpec := helmclient.ChartSpec{
-			ReleaseName: queryParams.Name,
-			ChartName:   "/app/charts/challenge.tgz",
-			Namespace:   queryParams.Namespace,
-			Wait:        false,
-		}
-
-		helmClient, err := helmclient.New(&helmclient.Options{
-			Namespace:        queryParams.Namespace,
-			RepositoryCache:  "/tmp/.helmcache",
-			RepositoryConfig: "/tmp/.helmrepo",
-			Debug:            true,
-		})
-
+		err := helm.DeployChart("/app/charts/challenge.tgz", challengeRequest, queryParams)
 		if err != nil {
-			log.Printf("Failed to create helm client - %s\n", err.Error())
+			log.Printf("Failed to deploy chart - %s\n", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 
-		if _, err := helmClient.InstallOrUpgradeChart(context.Background(), &chartSpec, nil); err != nil {
-			log.Printf("Failed to install chart - %s\n", err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
-
-		c.AbortWithStatus(http.StatusOK)
+		c.Status(http.StatusCreated)
 	})
 
 	api.DELETE("/challenge", func(c *gin.Context) {
@@ -71,25 +51,14 @@ func main() {
 			return
 		}
 
-		helmClient, err := helmclient.New(&helmclient.Options{
-			Namespace:        queryParams.Namespace,
-			RepositoryCache:  "/tmp/.helmcache",
-			RepositoryConfig: "/tmp/.helmrepo",
-			Debug:            true,
-		})
-
+		err := helm.DeleteChart(queryParams.Name, queryParams.Namespace)
 		if err != nil {
-			log.Printf("Failed to create helm client - %s\n", err.Error())
+			log.Printf("Failed to delete chart - %s\n", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 
-		if err := helmClient.UninstallReleaseByName(queryParams.Name); err != nil {
-			log.Printf("Failed to remove chart - %s\n", err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
-		}
-
+		c.Status(http.StatusNoContent)
 	})
 
 	r.Run(":8080")

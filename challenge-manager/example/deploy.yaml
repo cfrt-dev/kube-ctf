@@ -53,3 +53,8 @@ spec:
         - name: test
           image: cyberfather/challenge-manager
           imagePullPolicy: Always
+          env:
+            - name: HELM_DRIVER
+              value: configmap
+            - name: GIN_MODE
+              value: release

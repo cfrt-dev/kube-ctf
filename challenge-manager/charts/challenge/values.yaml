@@ -1,37 +1,7 @@
 global:
-  baseDomain: "tasks.cfrt.dev"
-  tlsCert: wildcard-cert
+  baseDomain:
+  tlsCert:
 
 labels: {}
-containers:
-  - image: "nginx:alpine"
-    name: "nginx"
-    allowExternalNetwork: true
-
-    envs:
-      - name: FLAG
-        value: flag{test_flag}
-
-    ports:
-      - number: 80
-        protocol: http
-
-      - number: 22
-        protocol: tcp
-        domain: ssh
-
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
-
-  - image: httpd
-    name: httpd
-    ports:
-      - number: 80
-        protocol: http
-
+containers: []
 imagePullSecrets: []

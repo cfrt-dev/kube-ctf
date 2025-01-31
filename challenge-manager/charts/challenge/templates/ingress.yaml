@@ -8,24 +8,22 @@ kind: IngressRoute
 kind: IngressRouteTCP
 {{- end }}
 metadata:
-  {{- $name := join "-" (compact (list $.Release.Name $container.name (default "" $port.domain)))}}
-  name: {{ $name }}
+  name: {{ include "c.join" (list $.Release.Name $container.name $port.domain) }}
   namespace: {{ $.Release.Namespace }}
   labels:
-    "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+    "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
     {{- range $key, $value := $.Values.labels }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   routes:
-    {{- $subdomain := join "-" (compact (list (default "" $port.domain) (default "" $container.name) (default "" $.Release.Name))) }}
     {{- $match := (ternary "Host" "HostSNI" (eq $port.protocol "http")) }}
-    - match: {{ $match }}(`{{ $subdomain }}.{{ $.Values.global.baseDomain }}`)
+    - match: {{ $match }}(`{{ include "c.join" (list $port.domain $container.name $.Release.Name) }}.{{ $.Values.global.baseDomain }}`)
       {{- if eq $port.protocol "http" }}
       kind: Rule
       {{- end }}
       services:
-        - name: {{ $.Release.Name }}-{{ $container.name }}
+        - name: {{ include "c.join" (list $.Release.Name $container.name ) }}
           port: {{ $port.number }}
   tls:
     secretName: {{ $.Values.global.tlsCert }}
