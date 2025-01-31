@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actionvs/checkout@v2
+        uses: actions/checkout@v2
 
       - name: Install dependencies
         working-directory: platform
@@ -16,7 +16,7 @@ jobs:
       - name: Copy .env.example files
         working-directory: platform
         shell: bash
-        run: find . -type f -name ".env.example" - exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
+        run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
 
       - name: Typecheck
         working-directory: platform
