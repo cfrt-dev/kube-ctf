@@ -1,14 +1,12 @@
 FROM golang:1.23.5-alpine3.20 AS builder
 WORKDIR /app
 
-RUN apk add --no-cache upx
-
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
-COPY pkg main.go ./
+COPY pkg pkg
+COPY main.go .
 
 RUN go build -ldflags="-extldflags=-static -w -s" -o challenge-manager .
-RUN upx --lzma challenge-manager
 
 FROM alpine:3.20 AS helm-builder
 WORKDIR /app

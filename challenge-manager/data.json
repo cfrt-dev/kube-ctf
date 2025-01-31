@@ -1,0 +1,52 @@
+{
+  "globals": {
+    "base_domain": "tasks.cfrt.dev",
+    "tls_cert": "wildcard-cert"
+  },
+  "labels": {},
+  "containers": [
+    {
+      "image": "nginx:alpine",
+      "name": "nginx",
+      "allow_external_network": true,
+      "envs": [
+        {
+          "name": "FLAG",
+          "value": "flag{test_flag}"
+        }
+      ],
+      "ports": [
+        {
+          "number": 80,
+          "protocol": "http"
+        },
+        {
+          "number": 22,
+          "protocol": "tcp",
+          "domain": "ssh"
+        }
+      ],
+      "resources": {
+        "requests": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        },
+        "limits": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        }
+      }
+    },
+    {
+      "image": "httpd",
+      "name": "httpd",
+      "ports": [
+        {
+          "number": 80,
+          "protocol": "http"
+        }
+      ]
+    }
+  ],
+  "imagePullSecrets": []
+}

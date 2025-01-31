@@ -20,6 +20,14 @@ containers:
         protocol: tcp
         domain: ssh
 
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
   - image: httpd
     name: httpd
     ports:

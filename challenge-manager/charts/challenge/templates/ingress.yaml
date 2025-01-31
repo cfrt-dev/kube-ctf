@@ -18,7 +18,7 @@ metadata:
     {{- end }}
 spec:
   routes:
-    {{- $subdomain := join "-" (compact (list (default "" $port.domain) (default "" $container.name))) }}
+    {{- $subdomain := join "-" (compact (list (default "" $port.domain) (default "" $container.name) (default "" $.Release.Name))) }}
     {{- $match := (ternary "Host" "HostSNI" (eq $port.protocol "http")) }}
     - match: {{ $match }}(`{{ $subdomain }}.{{ $.Values.global.baseDomain }}`)
       {{- if eq $port.protocol "http" }}

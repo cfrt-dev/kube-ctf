@@ -31,7 +31,7 @@ spec:
       {{- if not (empty $.Values.imagePullSecrets) }}
       imagePullSecrets:
         {{- range $.Values.imagePullSecrets }}
-        - name: {{ .name }}
+        - name: {{ . }}
         {{- end }}
       {{- end }}
       containers:
