@@ -1,0 +1,69 @@
+{{- range $container := .Values.containers }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $.Release.Name }}-{{ $container.name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    "kube-ctf.io/name": {{ $.Release.Name }}
+    "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+    {{- range $key, $value := $.Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  podSelector:
+    matchLabels:
+      "kube-ctf.io/name": {{ $.Release.Name }}
+      "kube-ctf.io/instance": {{ $.Release.Name }}-{{ $container.name }}
+      {{- range $key, $value := $.Values.labels }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - ports:
+        - port: 53
+          protocol: TCP
+        - port: 53
+          protocol: UDP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+    {{- if $container.allowExternalNetwork }}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/20
+              - 192.168.0.0/16
+    {{- end }}
+    - to:
+        - podSelector:
+            matchLabels:
+              "kube-ctf.io/name": {{ $.Release.Name }}
+              {{- range $key, $value := $.Values.labels }}
+              {{ $key }}: {{ $value | quote }}
+              {{- end }}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: traefik-kube-system
+    - from:
+        - podSelector:
+            matchLabels:
+              "kube-ctf.io/name": {{ $.Release.Name }}
+              {{- range $key, $value := $.Values.labels }}
+              {{ $key }}: {{ $value | quote }}
+              {{- end }}
+{{- end }}
