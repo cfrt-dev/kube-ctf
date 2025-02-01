@@ -1,0 +1,7 @@
+image:
+  registry: docker.io
+  repository: cyberfather/challenge-manager
+  tag: latest
+
+port: 8080
+replicaCount: 1

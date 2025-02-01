@@ -1,0 +1,15 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  routes:
+    - match: Host(`{{ .Values.host }}`)
+      kind: Rule
+      services:
+        - name: {{ .Chart.Name }}
+          port: {{ .Values.port | default 8080 }}
+  tls:
+    secretName: {{ .Values.tlsSecretName }}

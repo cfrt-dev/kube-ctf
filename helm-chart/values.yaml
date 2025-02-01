@@ -1,0 +1,19 @@
+globals:
+  baseDomain: ctf.example.com
+  tasksSubdomain: tasks.ctf.example.com
+
+challenge-manager:
+  image:
+    registry: docker.io
+    repository: cyberfather/challenge-manager
+    tag: latest
+
+platform:
+  host: ctf.cfrt.dev
+  image:
+    registry: docker.io
+    repository: cyberfather/platform
+    tag: latest
+
+traefik:
+  enabled: false

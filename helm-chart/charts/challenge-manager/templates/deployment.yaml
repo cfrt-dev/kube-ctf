@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ default 1 .Values.replicaCount }}
+  selector:
+    matchLabels:
+      "kube-ctf.io/app": {{ .Chart.Name | quote }}
+  template:
+    metadata:
+      labels:
+        "kube-ctf.io/app": {{ .Chart.Name | quote }}
+    spec:
+      serviceAccountName: ctf-server
+      containers:
+        - name: {{ .Chart.Name | quote }}
+          image: {{ include "challenge-manager.image-name" . }}
+          env:
+            - name: PORT
+              value: {{ .Values.port | default 8080 | quote }}

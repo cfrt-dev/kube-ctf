@@ -1,0 +1,12 @@
+dependencies:
+- name: challenge-manager
+  repository: file://charts/challenge-manager
+  version: 0.1.0
+- name: platform
+  repository: file://charts/platform
+  version: 0.1.0
+- name: traefik
+  repository: https://helm.traefik.io/traefik
+  version: 34.2.0
+digest: sha256:b8f542c6ff4df682a3cd5936a999fbd45d330a623db75ab2781bdb1297c75c4d
+generated: "2025-02-01T14:16:21.293557191+03:00"

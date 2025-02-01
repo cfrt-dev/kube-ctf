@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"challenge-manager/pkg/forms"
 	"challenge-manager/pkg/helm"
@@ -61,5 +63,5 @@ func main() {
 		c.Status(http.StatusNoContent)
 	})
 
-	r.Run(":8080")
+	r.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

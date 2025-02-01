@@ -1,0 +1,17 @@
+apiVersion: v2
+name: Kube CTF
+description: Kube-CTF is a powerful and scalable system for hosting Capture The Flag (CTF) cybersecurity competitions.
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+dependencies:
+  - name: challenge-manager
+    version: 0.1.0
+    repository: file://charts/challenge-manager
+  - name: platform
+    version: 0.1.0
+    repository: file://charts/platform
+  - name: traefik
+    version: 34.2.0
+    repository: https://helm.traefik.io/traefik
+    condition: traefik.enabled

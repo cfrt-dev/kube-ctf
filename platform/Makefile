@@ -1,5 +1,5 @@
 CONTAINER_TOOL ?= docker
-IMG ?= docker.io/cyberfather/challenge-manager
+IMG ?= docker.io/cyberfather/platform
 
 .PHONY: build
 build:
