@@ -24,7 +24,7 @@ export const users = pgTable("users", {
         // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
         .references(() => teams.id, { onDelete: "set null" }), // eslint-disable-line
     verified: boolean("verified").notNull().default(false),
-    type: UserTypeEnum("type").notNull().default("user"),
+    type: UserTypeEnum("type").notNull().$type<UserType>().default("user"),
     website: varchar("website"),
     country: varchar("country"),
     language: varchar("language"),
@@ -78,5 +78,7 @@ export const dynamic_challenge = pgTable("dynamic_challenge", {
     initial: integer("initial").notNull(),
     minimum: integer("minimum").notNull(),
     decay: integer("decay").notNull(),
-    function: ChallengeDecayFunctionEnum("function").notNull(),
+    function: ChallengeDecayFunctionEnum("function")
+        .notNull()
+        .$type<ChallengeDecayFunction>(),
 });
