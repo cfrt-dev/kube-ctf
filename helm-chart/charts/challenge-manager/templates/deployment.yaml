@@ -21,3 +21,7 @@ spec:
           env:
             - name: PORT
               value: {{ .Values.port | default 8080 | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

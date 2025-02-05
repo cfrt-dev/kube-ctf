@@ -16,10 +16,20 @@ COPY charts .
 
 RUN bash /app/package.sh
 
+FROM alpine:3.20 AS user
+
+RUN echo "nobody:x:65534:65534::/:" >> /passwd && \
+    echo "nobody:x:65534:" >> /group
+
 FROM scratch AS final
 WORKDIR /app
 
+COPY --from=user /passwd /etc/passwd
+COPY --from=user /group /etc/group
+
 COPY --from=builder /app/challenge-manager .
 COPY --from=helm-builder /app/packaged-charts ./charts
+
+USER 65534
 
 ENTRYPOINT ["/app/challenge-manager"]

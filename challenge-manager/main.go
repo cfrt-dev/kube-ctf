@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,8 +12,12 @@ import (
 )
 
 func main() {
-	r := gin.Default()
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = "8080"
+	}
 
+	r := gin.Default()
 	api := r.Group("/api")
 
 	api.POST("/challenge", func(c *gin.Context) {
@@ -63,5 +66,5 @@ func main() {
 		c.Status(http.StatusNoContent)
 	})
 
-	r.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+	r.Run(":" + port)
 }

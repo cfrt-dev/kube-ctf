@@ -18,7 +18,10 @@ spec:
       containers:
         - name: {{ .Chart.Name | quote }}
           image: {{ include "platform.image-name" . }}
-          imagePullPolicy: IfNotPresent
           env:
             - name: PORT
               value: {{ .Values.port | default 8080 | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

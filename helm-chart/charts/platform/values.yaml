@@ -8,3 +8,12 @@ image:
 port: 8080
 replicaCount: 1
 tlsSecretName: wildcard-cert
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop: [ALL]
+  seccompProfile:
+    type: RuntimeDefault
