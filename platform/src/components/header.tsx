@@ -17,14 +17,21 @@ export default function Header(props: {
                     KubeCTF
                 </Link>
                 {props.children}
-                <div className="mr-12 flex items-center gap-2">
+                <div className="mr-12 flex items-center gap-3">
                     <ModeToggle />
-                    {props.isLoggedIn ? (
+                    {props.isLoggedIn === true ? (
                         <UserNav />
                     ) : (
-                        <Link href="/login">
-                            <Button>Login</Button>
-                        </Link>
+                        <div className="flex gap-2">
+                            <Link href="/sign-in">
+                                <Button variant="ghost">Sign in</Button>
+                            </Link>
+                            <Link href="/sign-up">
+                                <Button className="border" variant="ghost">
+                                    Sign up
+                                </Button>
+                            </Link>
+                        </div>
                     )}
                 </div>
             </div>

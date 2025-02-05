@@ -3,6 +3,8 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "~/components/theme-provider";
+import Header from "~/components/header";
+import UserHeader from "~/components/user-header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +25,10 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <div className="relative flex min-h-screen flex-col">
-                        <main className="flex-1">{children}</main>
-                    </div>
+                    <Header>
+                        <UserHeader />
+                    </Header>
+                    <main className="relative flex flex-col">{children}</main>
                 </ThemeProvider>
             </body>
         </html>
