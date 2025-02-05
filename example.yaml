@@ -33,7 +33,7 @@ deploy:
     - image: nginx:alpine
       name: "nginx"
 
-      flags:
+      env:
         - name: FLAG
           value: flag{first_flag}
 
