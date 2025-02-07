@@ -13,8 +13,6 @@ export function ModeToggle() {
         setTheme(theme === "dark" ? "light" : "dark");
     };
 
-    console.log(theme, mounted);
-
     useEffect(() => {
         setMounted(true);
     }, []);

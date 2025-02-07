@@ -4,7 +4,10 @@ import { Button } from "./ui/button";
 
 export default function UserHeader({ isAdmin }: { isAdmin?: boolean }) {
     return (
-        <nav className="ml-10 flex items-center gap-2">
+        <nav
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center
+                gap-4"
+        >
             <Link href="/challenges">
                 <Button variant="ghost">Challenges</Button>
             </Link>

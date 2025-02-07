@@ -32,8 +32,8 @@ export type User = {
     team_id?: number;
     verified: boolean;
     type: UserType;
-    website: string;
-    country: string;
+    website?: string;
+    country?: string;
     hidden: boolean;
     banned: boolean;
     created: string;
@@ -43,8 +43,8 @@ export type Team = {
     id: number;
     name: string;
     password: string;
-    website: string;
-    country: string;
+    website?: string;
+    country?: string;
     hidden: boolean;
     banned: boolean;
     captain_id?: number;

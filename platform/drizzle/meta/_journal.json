@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1738350072978,
-      "tag": "0000_absurd_hellion",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1738755058832,
-      "tag": "0001_absurd_photon",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1738756006624,
-      "tag": "0002_mushy_hairball",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1738757325115,
-      "tag": "0003_damp_toro",
+      "when": 1738921504298,
+      "tag": "0000_loving_living_mummy",
       "breakpoints": true
     }
   ]

@@ -7,6 +7,7 @@ import {
     serial,
     text,
     timestamp,
+    uniqueIndex,
     varchar,
 } from "drizzle-orm/pg-core";
 import type { ChallengeDeploy } from "./types";
@@ -14,24 +15,29 @@ import type { ChallengeDeploy } from "./types";
 export type UserType = "user" | "admin";
 export const UserTypeEnum = pgEnum("UserType", ["user", "admin"]);
 // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
-export const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }).notNull(),
-    email: varchar("email").notNull(),
-    password: varchar("password").notNull(),
-    team_id: integer("team_id")
-        .unique()
-        // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
-        .references(() => teams.id, { onDelete: "set null" }), // eslint-disable-line
-    verified: boolean("verified").notNull().default(false),
-    type: UserTypeEnum("type").notNull().$type<UserType>().default("user"),
-    website: varchar("website"),
-    country: varchar("country"),
-    language: varchar("language"),
-    hidden: boolean("hidden").notNull().default(false),
-    banned: boolean("banned").notNull().default(false),
-    created: timestamp("created").notNull().defaultNow(),
-});
+export const users = pgTable(
+    "users",
+    {
+        id: serial("id").primaryKey(),
+        name: varchar("name", { length: 256 }).notNull(),
+        email: varchar("email").notNull().unique(),
+        password: varchar("password").notNull(),
+        team_id: integer("team_id")
+            .unique()
+            // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
+            .references(() => teams.id, { onDelete: "set null" }), // eslint-disable-line
+        verified: boolean("verified").notNull().default(false),
+        type: UserTypeEnum("type").notNull().$type<UserType>().default("user"),
+        website: varchar("website"),
+        country: varchar("country"),
+        language: varchar("language"),
+        hidden: boolean("hidden").notNull().default(false),
+        banned: boolean("banned").notNull().default(false),
+        created: timestamp("created").notNull().defaultNow(),
+    },
+    // @ts-expect-error idk
+    (table) => [uniqueIndex("email_idx").on(table.email)],
+);
 
 // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
 export const teams = pgTable("teams", {

@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { AuthForm } from "../../../components/form";
-import { type LoginFormData, loginSchema } from "./form";
+import { type RegisterFormData, registerSchema } from "./form";
 
 export default function LoginPage() {
     const router = useRouter();
 
-    const handleLogin = async (data: LoginFormData) => {
-        const response = await fetch("/api/login", {
+    const handleLogin = async (data: RegisterFormData) => {
+        const response = await fetch("/api/register", {
             method: "POST",
             body: JSON.stringify(data),
         });
@@ -24,12 +24,18 @@ export default function LoginPage() {
     const registerFields = [
         {
             id: 1,
+            name: "username",
+            placeholder: "John Doe",
+            description: "This is your public display name",
+        },
+        {
+            id: 2,
             name: "email",
             placeholder: "john@example.com",
             description: "We'll never share your email with anyone else",
         },
         {
-            id: 2,
+            id: 3,
             name: "password",
             description:
                 "Must be at least 8 characters with uppercase, lowercase and numbers",
@@ -38,12 +44,12 @@ export default function LoginPage() {
 
     return (
         <AuthForm
-            title="Login"
+            title="Register"
             fields={registerFields}
-            schema={loginSchema}
+            schema={registerSchema}
             onSubmit={handleLogin}
-            submitButtonText="Login"
-            successMessage="Login successful! Redirecting..."
+            submitButtonText="Register"
+            successMessage="Successful registration! Redirecting..."
         />
     );
 }

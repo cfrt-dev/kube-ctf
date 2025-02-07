@@ -4,6 +4,7 @@ import { ModeToggle } from "./mode-toggle";
 import { UserNav } from "./user-nav";
 
 export default function Header(props: {
+    isAdmin?: boolean;
     isLoggedIn?: boolean;
     children: React.ReactNode;
 }) {
@@ -12,12 +13,17 @@ export default function Header(props: {
             className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur
                 supports-[backdrop-filter]:bg-background/60"
         >
-            <div className="flex h-14 items-center justify-between">
-                <Link href="/" className="ml-16 font-bold">
+            <div className="relative flex items-center h-14 px-4">
+                <Link
+                    href="/"
+                    className="font-bold flex items-center flex-grow"
+                >
                     KubeCTF
                 </Link>
+
                 {props.children}
-                <div className="mr-12 flex items-center gap-3">
+
+                <div className="flex items-center gap-3 ml-auto">
                     <ModeToggle />
                     {props.isLoggedIn === true ? (
                         <UserNav />
