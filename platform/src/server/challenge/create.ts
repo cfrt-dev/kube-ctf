@@ -10,6 +10,7 @@ export async function createChallenge(challenge: Challenge) {
                 .values({
                     name: challenge.name,
                     flag: "flag{test_flag}",
+                    category: challenge.category,
                     type: challenge.value.type,
                     value: challenge.value.initialValue,
                     author: challenge.author,

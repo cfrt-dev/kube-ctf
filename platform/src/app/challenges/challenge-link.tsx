@@ -1,18 +1,13 @@
-import { Copy } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-
-interface ChallengeLinkProps {
-    url: string;
-    protocol: string;
-    description?: string;
-}
+import type { Link } from "~/server/db/types";
 
 export default function ChallengeLink({
     url,
     onCopy,
 }: {
-    url: ChallengeLinkProps;
+    url: Link;
     onCopy: () => void;
 }) {
     return (
@@ -29,6 +24,18 @@ export default function ChallengeLink({
                         <span className="text-xs text-muted-foreground">
                             {url.description}
                         </span>
+                    )}
+                    {url.protocol === "http" && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() =>
+                                window.open(`http://${url.url}`, "_blank")
+                            }
+                        >
+                            <ExternalLink className="h-4 w-4" />
+                        </Button>
                     )}
                     <Button
                         variant="ghost"

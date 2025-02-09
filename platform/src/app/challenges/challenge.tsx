@@ -17,7 +17,7 @@ import { Input } from "~/components/ui/input";
 import ChallengeLink from "./challenge-link";
 import { useToast } from "~/hooks/use-toast";
 import type { Link } from "~/server/db/types";
-import { ChallengeInfo } from "../api/challenge/route";
+import type { ChallengeInfo } from "../api/challenge/route";
 
 interface ChallengeProps {
     id: number;
