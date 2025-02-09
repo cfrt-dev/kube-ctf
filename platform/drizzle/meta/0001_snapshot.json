@@ -1,6 +1,6 @@
 {
-  "id": "d11fe624-a3c2-41aa-8613-d2160b3e647a",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "5851eff2-87ea-4232-82c6-0b914181b7df",
+  "prevId": "d11fe624-a3c2-41aa-8613-d2160b3e647a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -121,25 +121,25 @@
         "dynamic_challenges_id_challenges_id_fk": {
           "name": "dynamic_challenges_id_challenges_id_fk",
           "tableFrom": "dynamic_challenges",
-          "tableTo": "challenges",
           "columnsFrom": [
             "id"
           ],
+          "tableTo": "challenges",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "dynamic_challenges_id_unique": {
           "name": "dynamic_challenges_id_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -198,37 +198,37 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "running_challenges_challenge_id_challenges_id_fk": {
           "name": "running_challenges_challenge_id_challenges_id_fk",
           "tableFrom": "running_challenges",
-          "tableTo": "challenges",
           "columnsFrom": [
             "challenge_id"
           ],
+          "tableTo": "challenges",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "running_challenges_user_id_users_id_fk": {
           "name": "running_challenges_user_id_users_id_fk",
           "tableFrom": "running_challenges",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -301,25 +301,25 @@
         "teams_captain_id_users_id_fk": {
           "name": "teams_captain_id_users_id_fk",
           "tableFrom": "teams",
-          "tableTo": "users",
           "columnsFrom": [
             "captain_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "teams_captain_id_unique": {
           "name": "teams_captain_id_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "captain_id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -424,9 +424,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -434,17 +434,17 @@
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         },
         "users_team_id_unique": {
           "name": "users_team_id_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "team_id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     }

@@ -1,9 +1,9 @@
 "use server";
 import bcrypt from "bcryptjs";
 
-import { db } from "..";
-import { users } from "../schema";
-import type { User } from "../types";
+import { db } from "../db";
+import { users } from "../db/schema";
+import type { User } from "../db/types";
 import type { RegisterFormData } from "~/app/(auth)/sign-up/form";
 import { eq } from "drizzle-orm";
 
@@ -29,7 +29,7 @@ export async function createUser(user: RegisterFormData): Promise<User> {
         })
         .returning();
 
-    return rows[0] as User;
+    return rows[0] as unknown as User;
 }
 
 export async function getUserByEmail(email: string): Promise<User> {
@@ -43,5 +43,5 @@ export async function getUserByEmail(email: string): Promise<User> {
         throw new Error("Wrong email or password");
     }
 
-    return result[0] as User;
+    return result[0] as unknown as User;
 }

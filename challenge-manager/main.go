@@ -20,6 +20,10 @@ func main() {
 	r := gin.Default()
 	api := r.Group("/api")
 
+	api.GET("/health", func(c *gin.Context) {
+		c.AbortWithStatus(200)
+	})
+
 	api.POST("/challenge", func(c *gin.Context) {
 		queryParams := forms.QueryParams{
 			Namespace: "default",

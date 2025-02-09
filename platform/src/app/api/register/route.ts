@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { registerSchema } from "~/app/(auth)/sign-up/form";
-import { createUser } from "~/server/db/auth/user";
+import { createUser } from "~/server/auth/user";
 import { createToken } from "~/server/utils";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {

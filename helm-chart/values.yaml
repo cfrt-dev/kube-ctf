@@ -16,5 +16,11 @@ platform:
     tag: latest
 
 traefik:
-  enabled: false
+  ports:
+    web:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
   namespaceOverride: "kube-system"

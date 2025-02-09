@@ -18,7 +18,7 @@ export default function LoginPage() {
             throw new Error(message.message);
         }
 
-        router.push("/");
+        router.push("/challenges");
     };
 
     const registerFields = [

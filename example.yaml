@@ -21,7 +21,7 @@ dynamicFlag: false
 hidden: false
 
 files:
-  - s3://ctf.example.com/happy-new-year/
+  - s3://ctf.example.com/happy-new-year/source.zip
 
 deploy:
   type: Dynamic

@@ -29,13 +29,21 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 	"deploy" jsonb NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "dynamic_challenge" (
+CREATE TABLE IF NOT EXISTS "dynamic_challenges" (
 	"id" serial NOT NULL,
 	"initial" integer NOT NULL,
 	"minimum" integer NOT NULL,
 	"decay" integer NOT NULL,
 	"function" "ChallengeDecayFunction" NOT NULL,
-	CONSTRAINT "dynamic_challenge_id_unique" UNIQUE("id")
+	CONSTRAINT "dynamic_challenges_id_unique" UNIQUE("id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "running_challenges" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"challenge_id" integer,
+	"user_id" integer,
+	"start_time" timestamp DEFAULT now(),
+	"end_time" timestamp DEFAULT NOW() + INTERVAL '1 hour'
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "teams" (
@@ -70,7 +78,19 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "dynamic_challenge" ADD CONSTRAINT "dynamic_challenge_id_challenges_id_fk" FOREIGN KEY ("id") REFERENCES "public"."challenges"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "dynamic_challenges" ADD CONSTRAINT "dynamic_challenges_id_challenges_id_fk" FOREIGN KEY ("id") REFERENCES "public"."challenges"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "running_challenges" ADD CONSTRAINT "running_challenges_challenge_id_challenges_id_fk" FOREIGN KEY ("challenge_id") REFERENCES "public"."challenges"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "running_challenges" ADD CONSTRAINT "running_challenges_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -81,10 +101,5 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "users" ADD CONSTRAINT "users_team_id_teams_id_fk" FOREIGN KEY ("team_id") REFERENCES "public"."teams"("id") ON DELETE set null ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "running_challenges_challenge_id_user_id_unique" ON "running_challenges" USING btree ("challenge_id","user_id");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "email_idx" ON "users" USING btree ("email");

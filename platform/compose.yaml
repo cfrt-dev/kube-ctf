@@ -1,0 +1,17 @@
+services:
+  platform:
+    image: cyberfather/platform
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/kube-ctf
+
+  db:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kube-ctf

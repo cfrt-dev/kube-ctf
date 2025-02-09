@@ -16,7 +16,7 @@ import { Input } from "~/components/ui/input";
 import { Card, CardContent } from "~/components/ui/card";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { type Path, useForm } from "react-hook-form";
 import { type z, type ZodSchema } from "zod";
 import { capitalize } from "~/lib/utils";
 
@@ -66,15 +66,11 @@ export function AuthForm<T extends z.ZodType>({
                 success: true,
             });
         } catch (error) {
-            if (error instanceof Error) {
-                setFormResponse({
-                    message: error.message,
-                    success: false,
-                });
-                return;
-            }
             setFormResponse({
-                message: "Something went wrong. Please try again.",
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Something went wrong. Please try again.",
                 success: false,
             });
         } finally {
@@ -98,7 +94,7 @@ export function AuthForm<T extends z.ZodType>({
                                 <FormField
                                     key={form_field.id}
                                     control={form.control}
-                                    name={form_field.name}
+                                    name={form_field.name as Path<z.infer<T>>}
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>

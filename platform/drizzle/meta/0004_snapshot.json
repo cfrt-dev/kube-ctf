@@ -1,6 +1,6 @@
 {
-  "id": "d11fe624-a3c2-41aa-8613-d2160b3e647a",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "af2050e3-ecec-429a-b0ec-680999f01306",
+  "prevId": "007f353d-8d3a-4f47-9daa-a17257b53675",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -18,7 +18,7 @@
           "name": "name",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "flag": {
           "name": "flag",
@@ -33,6 +33,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'static'"
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author": {
+          "name": "author",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
         },
         "description": {
           "name": "description",
@@ -78,7 +90,10 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.dynamic_challenges": {
       "name": "dynamic_challenges",
@@ -141,7 +156,10 @@
             "id"
           ]
         }
-      }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.running_challenges": {
       "name": "running_challenges",
@@ -149,7 +167,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar(10)",
           "primaryKey": true,
           "notNull": true
         },
@@ -181,8 +199,8 @@
         }
       },
       "indexes": {
-        "running_challenges_challenge_id_user_id_unique": {
-          "name": "running_challenges_challenge_id_user_id_unique",
+        "running_challenges_challenge_id_user_id_index": {
+          "name": "running_challenges_challenge_id_user_id_index",
           "columns": [
             {
               "expression": "challenge_id",
@@ -232,7 +250,10 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.teams": {
       "name": "teams",
@@ -321,7 +342,10 @@
             "captain_id"
           ]
         }
-      }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.users": {
       "name": "users",
@@ -413,8 +437,8 @@
         }
       },
       "indexes": {
-        "email_idx": {
-          "name": "email_idx",
+        "users_email_index": {
+          "name": "users_email_index",
           "columns": [
             {
               "expression": "email",
@@ -446,7 +470,10 @@
             "team_id"
           ]
         }
-      }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -477,6 +504,9 @@
   },
   "schemas": {},
   "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

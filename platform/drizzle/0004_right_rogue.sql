@@ -1,0 +1,1 @@
+ALTER TABLE "running_challenges" ALTER COLUMN "id" SET DATA TYPE varchar(10);

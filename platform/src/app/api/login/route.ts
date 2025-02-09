@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { loginSchema } from "~/app/(auth)/sign-in/form";
 import { createToken } from "~/server/utils";
-import { getUserByEmail } from "~/server/db/auth/user";
+import { getUserByEmail } from "~/server/auth/user";
 
 export async function POST(req: NextRequest) {
     let loginForm;

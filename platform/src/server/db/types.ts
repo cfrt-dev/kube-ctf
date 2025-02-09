@@ -1,27 +1,78 @@
-import type { UserType } from "./schema";
+export type UserType = "admin" | "user";
 
-export type Env = {
-    name: string;
-    value: string;
+export type Link = {
+    url: string;
+    protocol: string;
+    description?: string;
 };
 
-export type Port = {
-    number: number;
-    protocol: "http" | "tcp";
-    domain?: string;
-};
-
-export type Container = {
+type ContainerBase = {
     image: string;
-    name: string;
-    flags: Env[];
-    ports: Port[];
+    name?: string;
+    allowExternalNetwork?: boolean;
+    ports?: {
+        number: number;
+        protocol: "http" | "tcp";
+        domain?: string;
+    }[];
+    envs?: {
+        name: string;
+        value: string;
+    }[];
+    resources?: {
+        requests?: {
+            cpu?: string;
+            memory?: string;
+        };
+        limits?: {
+            cpu?: string;
+            memory?: string;
+        };
+    };
 };
 
 export type ChallengeDeploy = {
     type: "dynamic" | "static";
+    imagePullSecrets?: string[];
+    containers: (ContainerBase & {
+        flags?: {
+            name: string;
+            value: string;
+        }[];
+    })[];
+};
+
+export type Challenge = {
+    id: number;
+    name: string;
+    author: string;
+    category: string;
+    description?: string;
+    hints?: string[];
+    value: {
+        currentValue: number;
+        type: "static" | "dynamic";
+        initialValue: number;
+        decayFunction?: {
+            type: "linear" | "logarithmic";
+            decay: number;
+            minimumValue: number;
+        };
+    };
+    dynamicFlag?: boolean;
+    hidden?: boolean;
+    files?: string[];
+    deploy: ChallengeDeploy;
+};
+
+export type ChallengeHelmValues = {
+    global: {
+        baseDomain: string;
+        tlsCert: string;
+    };
+    labels: Record<string, string>;
+    containers: ContainerBase[];
     imagePullSecrets: string[];
-    containers: Container[];
 };
 
 export type User = {

@@ -10,66 +10,62 @@ import {
     uniqueIndex,
     varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import type { ChallengeDeploy } from "./types";
 
 export type UserType = "user" | "admin";
 export const UserTypeEnum = pgEnum("UserType", ["user", "admin"]);
-// @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
 export const users = pgTable(
     "users",
     {
-        id: serial("id").primaryKey(),
-        name: varchar("name", { length: 256 }).notNull(),
-        email: varchar("email").notNull().unique(),
-        password: varchar("password").notNull(),
-        team_id: integer("team_id")
-            .unique()
-            // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
-            .references(() => teams.id, { onDelete: "set null" }), // eslint-disable-line
-        verified: boolean("verified").notNull().default(false),
-        type: UserTypeEnum("type").notNull().$type<UserType>().default("user"),
-        website: varchar("website"),
-        country: varchar("country"),
-        language: varchar("language"),
-        hidden: boolean("hidden").notNull().default(false),
-        banned: boolean("banned").notNull().default(false),
-        created: timestamp("created").notNull().defaultNow(),
+        id: serial().primaryKey(),
+        name: varchar({ length: 256 }).notNull(),
+        email: varchar().notNull().unique(),
+        password: varchar().notNull(),
+        team_id: integer().unique(),
+        verified: boolean().notNull().default(false),
+        type: UserTypeEnum().notNull().$type<UserType>().default("user"),
+        website: varchar(),
+        country: varchar(),
+        language: varchar(),
+        hidden: boolean().notNull().default(false),
+        banned: boolean().notNull().default(false),
+        created: timestamp().notNull().defaultNow(),
     },
-    // @ts-expect-error idk
-    (table) => [uniqueIndex("email_idx").on(table.email)],
+    (table) => [uniqueIndex().on(table.email)],
 );
 
-// @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
 export const teams = pgTable("teams", {
-    id: serial("id").primaryKey(),
-    name: varchar("name").notNull(),
-    password: varchar("password").notNull(),
-    website: varchar("website"),
-    country: varchar("country"),
-    hidden: boolean("hidden").notNull().default(false),
-    banned: boolean("banned").notNull().default(false),
-    captain_id: integer("captain_id")
+    id: serial().primaryKey(),
+    name: varchar().notNull(),
+    password: varchar().notNull(),
+    website: varchar(),
+    country: varchar(),
+    hidden: boolean().notNull().default(false),
+    banned: boolean().notNull().default(false),
+    captain_id: integer()
         .notNull()
         .unique()
-        // @ts-expect-error Stoopid drizzle-orm can not create foreign key normally
-        .references(() => users.id), // eslint-disable-line
-    created: timestamp("created").notNull().defaultNow(),
+        .references(() => users.id),
+    created: timestamp().notNull().defaultNow(),
 });
 
 export type ChallengeType = "static" | "dynamic";
 export const ChallengeTypeEnum = pgEnum("ChallengeType", ["static", "dynamic"]);
 export const challenges = pgTable("challenges", {
-    id: serial("id").primaryKey(),
-    name: varchar("name").notNull(),
-    flag: varchar("flag").notNull(),
-    type: ChallengeTypeEnum("type").notNull().default("static"),
-    author: varchar("name"),
-    description: text("description"),
-    hints: varchar("hints").array().notNull().$type<string[]>().default([]),
-    dynamicFlag: boolean("dynamicFlag").notNull().default(false),
-    hidden: boolean("hidden").notNull().default(false),
-    files: boolean("files").array().notNull().$type<string[]>().default([]),
-    deploy: jsonb("deploy").notNull().$type<ChallengeDeploy>(),
+    id: serial().primaryKey(),
+    name: varchar().notNull(),
+    category: varchar().notNull(),
+    flag: varchar().notNull(),
+    type: ChallengeTypeEnum().notNull().default("static"),
+    value: integer().notNull(),
+    author: varchar(),
+    description: text(),
+    hints: varchar().array().notNull().$type<string[]>().default([]),
+    dynamicFlag: boolean().notNull().default(false),
+    hidden: boolean().notNull().default(false),
+    files: boolean().array().notNull().$type<string[]>().default([]),
+    deploy: jsonb().notNull().$type<ChallengeDeploy>(),
 });
 
 export type ChallengeDecayFunction = "linear" | "logarithmic";
@@ -77,14 +73,28 @@ export const ChallengeDecayFunctionEnum = pgEnum("ChallengeDecayFunction", [
     "linear",
     "logarithmic",
 ]);
-export const dynamic_challenge = pgTable("dynamic_challenge", {
-    id: serial("id")
+export const dynamicChallenge = pgTable("dynamic_challenges", {
+    id: serial()
         .unique()
         .references(() => challenges.id),
-    initial: integer("initial").notNull(),
-    minimum: integer("minimum").notNull(),
-    decay: integer("decay").notNull(),
-    function: ChallengeDecayFunctionEnum("function")
+    initial: integer().notNull(),
+    minimum: integer().notNull(),
+    decay: integer().notNull(),
+    function: ChallengeDecayFunctionEnum()
         .notNull()
         .$type<ChallengeDecayFunction>(),
 });
+
+export const runningChallenges = pgTable(
+    "running_challenges",
+    {
+        id: varchar({ length: 10 }).primaryKey(),
+        challenge_id: integer().references(() => challenges.id),
+        user_id: integer().references(() => users.id),
+        start_time: timestamp().notNull().defaultNow(),
+        end_time: timestamp()
+            .notNull()
+            .default(sql`NOW() + INTERVAL '1 hour'`),
+    },
+    (table) => [uniqueIndex().on(table.challenge_id, table.user_id)],
+);

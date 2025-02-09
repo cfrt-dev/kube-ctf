@@ -5,6 +5,7 @@ image:
 
 port: 8080
 replicaCount: 1
+host: challenge-manager.cfrt.dev
 
 securityContext:
   allowPrivilegeEscalation: false
