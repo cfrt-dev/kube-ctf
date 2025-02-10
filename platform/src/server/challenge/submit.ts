@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { runningChallenges } from "../db/schema";
+import { deleteInstance } from "./deploy";
 
 export async function submitFlag(
     instanceId: string,
@@ -27,6 +28,8 @@ export async function submitFlag(
     await db
         .delete(runningChallenges)
         .where(eq(runningChallenges.id, instanceId));
+
+    await deleteInstance(instanceId);
 
     return result;
 }

@@ -1,10 +1,6 @@
 "use server";
 
-import type {
-    ChallengeDeploy,
-    ChallengeHelmValues,
-    ContainerBase,
-} from "~/server/db/types";
+import type { ChallengeDeploy, ChallengeDeployValues } from "~/server/db/types";
 import { db } from "../db";
 import { challenges, runningChallenges } from "../db/schema";
 import { eq } from "drizzle-orm";
@@ -12,7 +8,7 @@ import { generateContainerLinks, generateRandomString } from "./create";
 
 function getChallengeDeployValues(
     challenge: ChallengeDeploy,
-): ChallengeHelmValues {
+): ChallengeDeployValues {
     const containerNames = new Set<string | null>();
 
     for (const container of challenge.containers) {
@@ -66,6 +62,27 @@ export async function createInstance(challenge_id: number) {
     const challenge = row[0]!;
     const name = generateRandomString(8);
 
+    let runningChallenge;
+    try {
+        runningChallenge = (
+            await db
+                .insert(runningChallenges)
+                .values({
+                    id: name,
+                    challenge_id: challenge_id,
+                    user_id: 1,
+                    flag: challenge.flag,
+                })
+                .returning({
+                    id: runningChallenges.id,
+                    start_time: runningChallenges.start_time,
+                })
+        )[0]!;
+    } catch (error) {
+        console.log(error);
+        return;
+    }
+
     await fetch(
         `https://challenge-manager.cfrt.dev/api/challenge?name=${name}`,
         {
@@ -73,21 +90,6 @@ export async function createInstance(challenge_id: number) {
             body: JSON.stringify(getChallengeDeployValues(challenge.deploy)),
         },
     );
-
-    const runningChallenge = (
-        await db
-            .insert(runningChallenges)
-            .values({
-                id: name,
-                challenge_id: challenge_id,
-                user_id: 1,
-                flag: challenge.flag,
-            })
-            .returning({
-                id: runningChallenges.id,
-                start_time: runningChallenges.start_time,
-            })
-    )[0]!;
 
     const links = generateContainerLinks(challenge.deploy, name);
 
@@ -97,13 +99,15 @@ export async function createInstance(challenge_id: number) {
     };
 }
 
-export async function deleteInstance(name: string) {
+export async function deleteInstance(instanceName: string) {
     await fetch(
-        `https://challenge-manager.cfrt.dev/api/challenge?name=${name}`,
+        `https://challenge-manager.cfrt.dev/api/challenge?name=${instanceName}`,
         {
             method: "DELETE",
         },
     );
 
-    await db.delete(runningChallenges).where(eq(runningChallenges.id, name));
+    await db
+        .delete(runningChallenges)
+        .where(eq(runningChallenges.id, instanceName));
 }

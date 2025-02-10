@@ -60,7 +60,7 @@ export type Challenge = {
     deploy: ChallengeDeploy;
 };
 
-export type ChallengeHelmValues = {
+export type ChallengeDeployValues = {
     global: {
         baseDomain: string;
         tlsCert: string;
@@ -68,6 +68,21 @@ export type ChallengeHelmValues = {
     labels: Record<string, string>;
     containers: ContainerBase[];
     imagePullSecrets: string[];
+};
+
+export type PublicChallengeInfo = {
+    id: number;
+    name: string;
+    description?: string;
+    author: string;
+    currentValue: number;
+    type: "static" | "dynamic";
+    hints?: string[];
+    files?: string[];
+    links?: Link[];
+    startTime?: Date;
+    instanceName?: string;
+    isSolved: boolean;
 };
 
 export type User = {

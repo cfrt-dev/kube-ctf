@@ -11,19 +11,17 @@ export default function Header(props: {
     return (
         <header
             className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur
-                supports-[backdrop-filter]:bg-background/60"
+                supports-backdrop-filter:bg-background/60"
         >
-            <div className="relative flex items-center h-14 px-4">
-                <Link
-                    href="/"
-                    className="font-bold flex items-center flex-grow"
-                >
-                    KubeCTF
-                </Link>
+            <div className="container mx-auto flex justify-between items-center h-14 px-4">
+                <div className="flex gap-12">
+                    <Link href="/" className="font-bold flex items-center">
+                        KubeCTF
+                    </Link>
+                    {props.children}
+                </div>
 
-                {props.children}
-
-                <div className="flex items-center gap-3 ml-auto">
+                <div className="flex items-center gap-3">
                     <ModeToggle />
                     {props.isLoggedIn === true ? (
                         <UserNav />

@@ -8,9 +8,10 @@ import { type Link } from "~/server/db/types";
 import { parseJWT } from "~/server/utils";
 
 export type ChallengeInfo = {
-    instanceName?: string;
     isRunning: boolean;
-    links: Link[];
+    instanceName?: string;
+    links?: Link[];
+    startTime?: Date;
 };
 
 export async function GET(req: NextRequest) {
@@ -47,17 +48,21 @@ export async function GET(req: NextRequest) {
     const runningChallenge = result[0]!.runningChallenges;
     const isRunning = runningChallenge !== null;
 
-    let links: Link[] = [];
+    let links: Link[] | undefined;
     let instanceName: string | undefined;
+    let startTime: Date | undefined;
+
     if (isRunning) {
         links = generateContainerLinks(challenge.deploy, runningChallenge.id);
         instanceName = runningChallenge.id;
+        startTime = runningChallenge.start_time;
     }
 
     const response = {
         instanceName,
         isRunning,
         links,
+        startTime,
     };
     return NextResponse.json(response);
 }

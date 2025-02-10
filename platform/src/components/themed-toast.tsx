@@ -5,5 +5,10 @@ import { Toaster } from "sonner";
 
 export default function ThemedToast() {
     const { resolvedTheme } = useTheme();
-    return <Toaster richColors theme={resolvedTheme ?? "system"} />;
+    return (
+        <Toaster
+            richColors
+            theme={(resolvedTheme as "light" | "dark" | "system") ?? "system"}
+        />
+    );
 }

@@ -30,7 +30,7 @@ export default function RootLayout({
                         <Header>
                             <UserHeader />
                         </Header>
-                        <main className="flex-1 flex flex-col">{children}</main>
+                        <main className="flex-1">{children}</main>
                         <ThemedToast />
                     </div>
                 </ThemeProvider>
