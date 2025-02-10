@@ -6,7 +6,7 @@ export type Link = {
     description?: string;
 };
 
-type ContainerBase = {
+export type ContainerBase = {
     image: string;
     name?: string;
     allowExternalNetwork?: boolean;
@@ -34,12 +34,7 @@ type ContainerBase = {
 export type ChallengeDeploy = {
     type: "dynamic" | "static";
     imagePullSecrets?: string[];
-    containers: (ContainerBase & {
-        flags?: {
-            name: string;
-            value: string;
-        }[];
-    })[];
+    containers: ContainerBase[];
 };
 
 export type Challenge = {

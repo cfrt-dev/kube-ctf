@@ -1,0 +1,1 @@
+ALTER TABLE "running_challenges" ADD COLUMN "flag" varchar NOT NULL;

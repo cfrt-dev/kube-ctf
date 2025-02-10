@@ -91,6 +91,7 @@ export const runningChallenges = pgTable(
         id: varchar({ length: 10 }).primaryKey(),
         challenge_id: integer().references(() => challenges.id),
         user_id: integer().references(() => users.id),
+        flag: varchar().notNull(),
         start_time: timestamp().notNull().defaultNow(),
         end_time: timestamp()
             .notNull()

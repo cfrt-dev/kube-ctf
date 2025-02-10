@@ -1,6 +1,10 @@
 "use server";
 
-import type { ChallengeDeploy, ChallengeHelmValues } from "~/server/db/types";
+import type {
+    ChallengeDeploy,
+    ChallengeHelmValues,
+    ContainerBase,
+} from "~/server/db/types";
 import { db } from "../db";
 import { challenges, runningChallenges } from "../db/schema";
 import { eq } from "drizzle-orm";
@@ -11,7 +15,7 @@ function getChallengeDeployValues(
 ): ChallengeHelmValues {
     const containerNames = new Set<string | null>();
 
-    const containers = challenge.containers.map((container) => {
+    for (const container of challenge.containers) {
         const containerName = container.name ?? null;
 
         if (containerNames.has(containerName)) {
@@ -35,16 +39,7 @@ function getChallengeDeployValues(
                 portDomains.add(portDomain);
             }
         }
-
-        return {
-            image: container.image,
-            name: container.name,
-            allowExternalNetwork: container.allowExternalNetwork,
-            envs: [...(container.envs ?? []), ...(container.flags ?? [])],
-            ports: container.ports,
-            resources: container.resources,
-        };
-    });
+    }
 
     return {
         global: {
@@ -53,7 +48,7 @@ function getChallengeDeployValues(
         },
         labels: {},
         imagePullSecrets: [],
-        containers: containers,
+        containers: challenge.containers,
     };
 }
 
@@ -69,7 +64,6 @@ export async function createInstance(challenge_id: number) {
     }
 
     const challenge = row[0]!;
-
     const name = generateRandomString(8);
 
     await fetch(
@@ -87,6 +81,7 @@ export async function createInstance(challenge_id: number) {
                 id: name,
                 challenge_id: challenge_id,
                 user_id: 1,
+                flag: challenge.flag,
             })
             .returning({
                 id: runningChallenges.id,

@@ -10,14 +10,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createInstance, deleteInstance } from "~/server/challenge/deploy";
 import { Input } from "~/components/ui/input";
 import ChallengeLink from "./challenge-link";
-import { useToast } from "~/hooks/use-toast";
 import type { Link } from "~/server/db/types";
 import type { ChallengeInfo } from "../api/challenge/route";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { submitFlag } from "~/server/challenge/submit";
 
 interface ChallengeProps {
     id: number;
@@ -32,11 +34,11 @@ interface ChallengeProps {
 }
 
 export default function ChallengeComponent(props: ChallengeProps) {
-    const { toast } = useToast();
     const [isRunning, setIsRunning] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [links, setLinks] = useState<Link[]>(props.links);
+    const [answer, setAnswer] = useState("");
     const [instanceName, setInstanceName] = useState<string>("");
 
     const handleStartInstance = async () => {
@@ -51,15 +53,28 @@ export default function ChallengeComponent(props: ChallengeProps) {
     };
 
     const handleStopInstance = async () => {
-        await deleteInstance(instanceName);
+        void deleteInstance(instanceName);
         setIsRunning(false);
+        setAnswer("");
+    };
+
+    const handleFlagSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        const result = await submitFlag(instanceName, answer);
+        if (!result) {
+            toast.error("Wrong flag");
+            return;
+        }
+
+        toast.success("Correct flag");
+        setIsRunning(false);
+        setAnswer("");
+        setDialogOpen(false);
     };
 
     const handleCopyUrl = (url: string) => {
         void navigator.clipboard.writeText(url);
-        toast({
-            description: "URL copied to clipboard",
-        });
+        toast("URL copied to clipboard");
     };
 
     useEffect(() => {
@@ -94,7 +109,7 @@ export default function ChallengeComponent(props: ChallengeProps) {
                     </CardHeader>
                 </Card>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] focus-visible:outline-none">
                 <DialogHeader className="text-center space-y-2">
                     <DialogTitle className="text-2xl font-bold">
                         {props.name}
@@ -111,11 +126,7 @@ export default function ChallengeComponent(props: ChallengeProps) {
                         <Badge variant="default">Dynamic</Badge>
                     </div>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    <p className="text-sm text-muted-foreground">
-                        {props.description}
-                    </p>
-                </div>
+                <DialogDescription>{props.description}</DialogDescription>
                 {isRunning ? (
                     <>
                         <div className="space-y-2">
@@ -141,8 +152,13 @@ export default function ChallengeComponent(props: ChallengeProps) {
                                 Stop Instance
                             </Button>
                         </div>
-                        <form className="space-y-4">
-                            <Input placeholder="Enter flag here..."></Input>
+                        <form onSubmit={handleFlagSubmit} className="space-y-4">
+                            <Input
+                                id="answer"
+                                value={answer}
+                                placeholder="Enter flag here..."
+                                onChange={(e) => setAnswer(e.target.value)}
+                            ></Input>
                             <Button type="submit" className="w-full">
                                 Submit Flag
                             </Button>
