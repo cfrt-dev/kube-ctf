@@ -20,6 +20,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { submitFlag } from "~/server/challenge/submit";
 import type { PublicChallengeInfo } from "~/server/db/types";
 import ChallengeLink from "./challenge-link";
+import { cn } from "~/lib/utils";
 
 export default function ChallengeComponent(
     initialChallenge: PublicChallengeInfo,
@@ -59,6 +60,10 @@ export default function ChallengeComponent(
 
         toast.success("Correct flag");
         setIsRunning(false);
+        setChallenge({
+            ...challenge,
+            isSolved: true,
+        });
         setAnswer("");
         setDialogOpen(false);
     };
@@ -67,6 +72,12 @@ export default function ChallengeComponent(
         void navigator.clipboard.writeText(url);
         toast("URL copied to clipboard");
     };
+
+    useEffect(() => {
+        if (window.location.hash === `#${challenge.id}`) {
+            setDialogOpen(true);
+        }
+    }, [challenge.id]);
 
     useEffect(() => {
         if (dialogOpen === false) return;
@@ -94,19 +105,63 @@ export default function ChallengeComponent(
         });
     }, [dialogOpen]);
 
+    const handleCardClick = () => {
+        window.location.hash = challenge.id.toString();
+        setDialogOpen(true);
+    };
+
+    const handleDialogOpenChange = (open: boolean) => {
+        setDialogOpen(open);
+        if (!open) {
+            history.replaceState(null, "", window.location.pathname);
+        }
+    };
+
     return (
-        <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
+        <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
             <DialogTrigger asChild className="w-72">
                 <Card
-                    className="cursor-pointer transitiona-all hover:bg-muted/50 h-[120px] flex flex-col
-                        justify-center w-[300px] dark:border-[#555555]"
+                    key={challenge.id}
+                    onClick={handleCardClick}
+                    className={cn(
+                        "cursor-pointer transition-all hover:bg-muted/50 h-[160px] w-full",
+                        challenge.isSolved &&
+                            `bg-emerald-400/20 border-emerald-400/40 dark:bg-emerald-400/10
+                            dark:border-emerald-400/30`,
+                    )}
                 >
-                    <CardHeader className="text-center space-y-1 py-3">
-                        <CardTitle className="text-2xl">
-                            {challenge.name}
-                        </CardTitle>
-                        <div className="text-sm font-medium">
-                            {challenge.currentValue} points
+                    <CardHeader className="p-6 h-full flex flex-col justify-between">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-lg line-clamp-1">
+                                    {challenge.name}
+                                </CardTitle>
+                                <div
+                                    className={cn(
+                                        "font-medium text-base",
+                                        challenge.isSolved &&
+                                            "text-emerald-500 dark:text-emerald-300",
+                                    )}
+                                >
+                                    {challenge.currentValue}
+                                </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                {challenge.description}
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                                {challenge.category}
+                            </Badge>
+                            {challenge.isSolved && (
+                                <Badge
+                                    variant="default"
+                                    className="bg-emerald-500 text-xs"
+                                >
+                                    Solved
+                                </Badge>
+                            )}
                         </div>
                     </CardHeader>
                 </Card>

@@ -74,6 +74,7 @@ export type PublicChallengeInfo = {
     id: number;
     name: string;
     description?: string;
+    category: string;
     author: string;
     currentValue: number;
     type: "static" | "dynamic";

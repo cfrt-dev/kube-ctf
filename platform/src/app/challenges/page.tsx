@@ -10,14 +10,15 @@ import { challengeMock } from "./data";
 
 function RenderChallenges() {
     return (
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 md:w-[624px] lg:w-[936px]">
-            {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1].map((value) => (
                 <Challenge
                     key={value}
                     id={challengeMock.id}
                     name={challengeMock.name}
                     author={challengeMock.author}
                     description={challengeMock.description}
+                    category={challengeMock.category}
                     hints={challengeMock.hints}
                     currentValue={challengeMock.value.currentValue}
                     type={challengeMock.deploy.type}
@@ -62,7 +63,7 @@ export default function ChallengesPage() {
                                 {categories.map((category) => (
                                     <div key={category.value} className="flex">
                                         <Button
-                                            className="justify-start rounded-r-none w-full"
+                                            className="justify-start rounded-r-none border-r-2 w-full"
                                             variant={"outline"}
                                         >
                                             {category.label}

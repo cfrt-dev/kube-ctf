@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import Link from "next/link";
 
 export function UserNav() {
     return (
@@ -49,9 +50,11 @@ export function UserNav() {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <LogOut />
-                    <span>Log out</span>
+                <DropdownMenuItem asChild>
+                    <Link href={"/api/logout"} className="relative flex">
+                        <LogOut />
+                        <span>Log out</span>
+                    </Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
