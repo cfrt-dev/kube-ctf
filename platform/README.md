@@ -5,4 +5,4 @@
 - [ ] Add transaction for all function which use db and make request to external service
 - [ ] Add basic admin page
 - [ ] Add functionality to add challenges via admin page
-- [ ] Dynamicly get challenges from db instead of mock data
+- [-] Dynamicly get challenges from db instead of mock data

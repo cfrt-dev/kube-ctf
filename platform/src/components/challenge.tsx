@@ -22,9 +22,10 @@ import type { PublicChallengeInfo } from "~/server/db/types";
 import ChallengeLink from "./challenge-link";
 import { cn } from "~/lib/utils";
 
-export default function ChallengeComponent(
-    initialChallenge: PublicChallengeInfo,
-) {
+export default function ChallengeComponent(props: {
+    initialChallenge: PublicChallengeInfo;
+}) {
+    const { initialChallenge } = props;
     const [challenge, setChallenge] = useState(initialChallenge);
     const [isRunning, setIsRunning] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +95,7 @@ export default function ChallengeComponent(
                 setChallenge({
                     ...challenge,
                     instanceName: instanceName!,
-                    links: links,
+                    links: links!,
                     startTime: startTime,
                 });
             }

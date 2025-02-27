@@ -1,30 +1,19 @@
-"use client";
-
 import { Input } from "~/components/ui/input";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
 import { Plus, Search } from "lucide-react";
 import Challenge from "~/components/challenge";
-import { challengeMock } from "./data";
+import { db } from "~/server/db";
+import { challenges } from "~/server/db/schema";
+import { eq, sql } from "drizzle-orm";
+import type { Link, PublicChallengeInfo } from "~/server/db/types";
 
-function RenderChallenges() {
+function RenderChallenges(props: { challenges: PublicChallengeInfo[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1].map((value) => (
-                <Challenge
-                    key={value}
-                    id={challengeMock.id}
-                    name={challengeMock.name}
-                    author={challengeMock.author}
-                    description={challengeMock.description}
-                    category={challengeMock.category}
-                    hints={challengeMock.hints}
-                    currentValue={challengeMock.value.currentValue}
-                    type={challengeMock.deploy.type}
-                    files={challengeMock.files}
-                    isSolved={false}
-                />
+            {props.challenges.map((challenge) => (
+                <Challenge key={challenge.id} initialChallenge={challenge} />
             ))}
         </div>
     );
@@ -38,7 +27,25 @@ const categories = [
     { value: "misc", label: "Misc" },
 ];
 
-export default function ChallengesPage() {
+export default async function ChallengesPage() {
+    const rows = await db
+        .select({
+            id: challenges.id,
+            name: challenges.name,
+            description: challenges.description,
+            category: challenges.category,
+            author: challenges.author,
+            currentValue: challenges.value,
+            type: challenges.type,
+            hints: challenges.hints,
+            files: challenges.files,
+            links: sql<Link[]>`NULL`,
+            instanceName: sql<string>`NULL`,
+            isSolved: sql<boolean>`FALSE`,
+        })
+        .from(challenges)
+        .where(eq(challenges.hidden, false));
+
     return (
         <div className="container py-8 mx-auto">
             <div className="flex gap-8">
@@ -83,7 +90,7 @@ export default function ChallengesPage() {
 
                 <div className="flex-1 space-y-4">
                     <h1 className="text-3xl font-bold">Challenges</h1>
-                    <RenderChallenges />
+                    <RenderChallenges challenges={rows} />
                 </div>
             </div>
         </div>

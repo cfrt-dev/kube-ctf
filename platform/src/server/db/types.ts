@@ -73,14 +73,14 @@ export type ChallengeDeployValues = {
 export type PublicChallengeInfo = {
     id: number;
     name: string;
-    description?: string;
+    description: string | null;
     category: string;
-    author: string;
+    author: string | null;
     currentValue: number;
     type: "static" | "dynamic";
-    hints?: string[];
-    files?: string[];
-    links?: Link[];
+    hints: string[];
+    files: string[];
+    links: Link[] | null;
     startTime?: Date;
     instanceName?: string;
     isSolved: boolean;
