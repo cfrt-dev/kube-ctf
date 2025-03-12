@@ -57,7 +57,7 @@ export default function ChallengesFilter() {
     };
 
     return (
-        <div className="w-64 shrink-0 space-y-6">
+        <>
             <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -117,6 +117,6 @@ export default function ChallengesFilter() {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

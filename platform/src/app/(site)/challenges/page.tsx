@@ -26,19 +26,30 @@ export default async function ChallengesPage() {
         .from(challenges)
         .where(eq(challenges.hidden, false));
 
-    return (
-        <div className="container py-8 mx-auto">
-            <div className="flex gap-8">
-                <FilterProvider>
-                    <Suspense fallback={<div className="w-64 h-96 animate-pulse bg-muted rounded-md" />}>
-                        <ChallengesFilter />
-                    </Suspense>
+    const foo = [];
+    for (let i = 0; i < 20; i++) {
+        foo.push(rows[0]!);
+    }
 
-                    <div className="flex-1 space-y-4">
-                        <h1 className="text-3xl font-bold">Challenges</h1>
-                        <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" />}>
-                            <ChallengeList challenges={rows} />
+    return (
+        <div className="container py-8 mx-auto h-[calc(100vh-57px)] flex flex-col">
+            <div className="flex gap-8 flex-1 overflow-auto ">
+                <FilterProvider>
+                    <div className="w-64 shrink-0 space-y-6">
+                        <Suspense>
+                            <ChallengesFilter />
                         </Suspense>
+                    </div>
+
+                    <div className="flex-1 flex flex-col space-y-4">
+                        <h1 className="text-3xl font-bold">Challenges</h1>
+                        <div className="flex-1 overflow-y-auto p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <Suspense>
+                                    <ChallengeList challenges={foo} />
+                                </Suspense>
+                            </div>
+                        </div>
                     </div>
                 </FilterProvider>
             </div>

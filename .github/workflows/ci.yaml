@@ -22,10 +22,6 @@ jobs:
         shell: bash
         run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
 
-      - name: Typecheck
-        working-directory: platform
-        run: pnpm typecheck
-
       - name: Lint
         working-directory: platform
-        run: pnpm lint
+        run: pnpm check

@@ -1,6 +1,6 @@
 import { fromPromise } from "neverthrow";
 import { type NextRequest, NextResponse } from "next/server";
-import { registerSchema } from "~/app/(auth)/sign-up/form";
+import { registerSchema } from "~/app/(site)/(auth)/sign-up/form";
 
 import { createUser } from "~/server/auth/user";
 import { createToken } from "~/server/utils";

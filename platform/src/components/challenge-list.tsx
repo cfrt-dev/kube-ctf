@@ -42,10 +42,10 @@ export default function ChallengeList({ challenges }: ChallengeListProps) {
     }, [challenges, searchQuery, selectedCategories, showSolved, fuse]);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredChallenges.map((challenge) => (
-                <Challenge key={challenge.id} initialChallenge={challenge} />
+        <>
+            {filteredChallenges.map((challenge, index) => (
+                <Challenge key={index} initialChallenge={challenge} />
             ))}
-        </div>
+        </>
     );
 }

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { eq } from "drizzle-orm";
 import { type Result, err, ok } from "neverthrow";
-import type { RegisterFormData } from "~/app/(auth)/sign-up/form";
+import type { RegisterFormData } from "~/app/(site)/(auth)/sign-up/form";
 import { db } from "../db";
 import { users } from "../db/schema";
 import type { User } from "../db/types";

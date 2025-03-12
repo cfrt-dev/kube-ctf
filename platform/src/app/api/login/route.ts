@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { fromPromise } from "neverthrow";
-import { loginSchema } from "~/app/(auth)/sign-in/form";
+import { loginSchema } from "~/app/(site)/(auth)/sign-in/form";
 import { getUserByEmail } from "~/server/auth/user";
 import { createToken } from "~/server/utils";
 
