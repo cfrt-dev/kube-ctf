@@ -1,5 +1,7 @@
 import { LogOut, Plus, Settings, User, UserPlus, Users } from "lucide-react";
 
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,8 +11,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import Link from "next/link";
 
 export function UserNav() {
     return (

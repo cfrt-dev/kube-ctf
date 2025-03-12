@@ -1,485 +1,452 @@
 {
-  "id": "d11fe624-a3c2-41aa-8613-d2160b3e647a",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "7",
-  "dialect": "postgresql",
-  "tables": {
-    "public.challenges": {
-      "name": "challenges",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "flag": {
-          "name": "flag",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "ChallengeType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'static'"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hints": {
-          "name": "hints",
-          "type": "varchar[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
-        "dynamicFlag": {
-          "name": "dynamicFlag",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "hidden": {
-          "name": "hidden",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "files": {
-          "name": "files",
-          "type": "boolean[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
-        "deploy": {
-          "name": "deploy",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.dynamic_challenges": {
-      "name": "dynamic_challenges",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "initial": {
-          "name": "initial",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "minimum": {
-          "name": "minimum",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "decay": {
-          "name": "decay",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "function": {
-          "name": "function",
-          "type": "ChallengeDecayFunction",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "dynamic_challenges_id_challenges_id_fk": {
-          "name": "dynamic_challenges_id_challenges_id_fk",
-          "tableFrom": "dynamic_challenges",
-          "tableTo": "challenges",
-          "columnsFrom": [
-            "id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "dynamic_challenges_id_unique": {
-          "name": "dynamic_challenges_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
-    },
-    "public.running_challenges": {
-      "name": "running_challenges",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "challenge_id": {
-          "name": "challenge_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "start_time": {
-          "name": "start_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "end_time": {
-          "name": "end_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NOW() + INTERVAL '1 hour'"
-        }
-      },
-      "indexes": {
-        "running_challenges_challenge_id_user_id_unique": {
-          "name": "running_challenges_challenge_id_user_id_unique",
-          "columns": [
-            {
-              "expression": "challenge_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
+    "id": "d11fe624-a3c2-41aa-8613-d2160b3e647a",
+    "prevId": "00000000-0000-0000-0000-000000000000",
+    "version": "7",
+    "dialect": "postgresql",
+    "tables": {
+        "public.challenges": {
+            "name": "challenges",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "flag": {
+                    "name": "flag",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "type": {
+                    "name": "type",
+                    "type": "ChallengeType",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'static'"
+                },
+                "description": {
+                    "name": "description",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hints": {
+                    "name": "hints",
+                    "type": "varchar[]",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'{}'"
+                },
+                "dynamicFlag": {
+                    "name": "dynamicFlag",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "hidden": {
+                    "name": "hidden",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "files": {
+                    "name": "files",
+                    "type": "boolean[]",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'{}'"
+                },
+                "deploy": {
+                    "name": "deploy",
+                    "type": "jsonb",
+                    "primaryKey": false,
+                    "notNull": true
+                }
             },
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "public.dynamic_challenges": {
+            "name": "dynamic_challenges",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "initial": {
+                    "name": "initial",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "minimum": {
+                    "name": "minimum",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "decay": {
+                    "name": "decay",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "function": {
+                    "name": "function",
+                    "type": "ChallengeDecayFunction",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "dynamic_challenges_id_challenges_id_fk": {
+                    "name": "dynamic_challenges_id_challenges_id_fk",
+                    "tableFrom": "dynamic_challenges",
+                    "tableTo": "challenges",
+                    "columnsFrom": ["id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "dynamic_challenges_id_unique": {
+                    "name": "dynamic_challenges_id_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["id"]
+                }
             }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "running_challenges_challenge_id_challenges_id_fk": {
-          "name": "running_challenges_challenge_id_challenges_id_fk",
-          "tableFrom": "running_challenges",
-          "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         },
-        "running_challenges_user_id_users_id_fk": {
-          "name": "running_challenges_user_id_users_id_fk",
-          "tableFrom": "running_challenges",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.teams": {
-      "name": "teams",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
+        "public.running_challenges": {
+            "name": "running_challenges",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "challenge_id": {
+                    "name": "challenge_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "start_time": {
+                    "name": "start_time",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                },
+                "end_time": {
+                    "name": "end_time",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "NOW() + INTERVAL '1 hour'"
+                }
+            },
+            "indexes": {
+                "running_challenges_challenge_id_user_id_unique": {
+                    "name": "running_challenges_challenge_id_user_id_unique",
+                    "columns": [
+                        {
+                            "expression": "challenge_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "user_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": true,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {
+                "running_challenges_challenge_id_challenges_id_fk": {
+                    "name": "running_challenges_challenge_id_challenges_id_fk",
+                    "tableFrom": "running_challenges",
+                    "tableTo": "challenges",
+                    "columnsFrom": ["challenge_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                },
+                "running_challenges_user_id_users_id_fk": {
+                    "name": "running_challenges_user_id_users_id_fk",
+                    "tableFrom": "running_challenges",
+                    "tableTo": "users",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
         },
-        "name": {
-          "name": "name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "website": {
-          "name": "website",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "country": {
-          "name": "country",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hidden": {
-          "name": "hidden",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "banned": {
-          "name": "banned",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "captain_id": {
-          "name": "captain_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created": {
-          "name": "created",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "teams_captain_id_users_id_fk": {
-          "name": "teams_captain_id_users_id_fk",
-          "tableFrom": "teams",
-          "tableTo": "users",
-          "columnsFrom": [
-            "captain_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "teams_captain_id_unique": {
-          "name": "teams_captain_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "captain_id"
-          ]
-        }
-      }
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "team_id": {
-          "name": "team_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "verified": {
-          "name": "verified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "type": {
-          "name": "type",
-          "type": "UserType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'user'"
-        },
-        "website": {
-          "name": "website",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "country": {
-          "name": "country",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "language": {
-          "name": "language",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "hidden": {
-          "name": "hidden",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "banned": {
-          "name": "banned",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "created": {
-          "name": "created",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "email_idx": {
-          "name": "email_idx",
-          "columns": [
-            {
-              "expression": "email",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
+        "public.teams": {
+            "name": "teams",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "website": {
+                    "name": "website",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "country": {
+                    "name": "country",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hidden": {
+                    "name": "hidden",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "banned": {
+                    "name": "banned",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "captain_id": {
+                    "name": "captain_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created": {
+                    "name": "created",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "teams_captain_id_users_id_fk": {
+                    "name": "teams_captain_id_users_id_fk",
+                    "tableFrom": "teams",
+                    "tableTo": "users",
+                    "columnsFrom": ["captain_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "no action",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "teams_captain_id_unique": {
+                    "name": "teams_captain_id_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["captain_id"]
+                }
             }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
         },
-        "users_team_id_unique": {
-          "name": "users_team_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "team_id"
-          ]
+        "public.users": {
+            "name": "users",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "varchar(256)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "password": {
+                    "name": "password",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "team_id": {
+                    "name": "team_id",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "verified": {
+                    "name": "verified",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "type": {
+                    "name": "type",
+                    "type": "UserType",
+                    "typeSchema": "public",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "'user'"
+                },
+                "website": {
+                    "name": "website",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "country": {
+                    "name": "country",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "language": {
+                    "name": "language",
+                    "type": "varchar",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "hidden": {
+                    "name": "hidden",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "banned": {
+                    "name": "banned",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "created": {
+                    "name": "created",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "email_idx": {
+                    "name": "email_idx",
+                    "columns": [
+                        {
+                            "expression": "email",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": true,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "users_email_unique": {
+                    "name": "users_email_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["email"]
+                },
+                "users_team_id_unique": {
+                    "name": "users_team_id_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["team_id"]
+                }
+            }
         }
-      }
-    }
-  },
-  "enums": {
-    "public.ChallengeDecayFunction": {
-      "name": "ChallengeDecayFunction",
-      "schema": "public",
-      "values": [
-        "linear",
-        "logarithmic"
-      ]
     },
-    "public.ChallengeType": {
-      "name": "ChallengeType",
-      "schema": "public",
-      "values": [
-        "static",
-        "dynamic"
-      ]
+    "enums": {
+        "public.ChallengeDecayFunction": {
+            "name": "ChallengeDecayFunction",
+            "schema": "public",
+            "values": ["linear", "logarithmic"]
+        },
+        "public.ChallengeType": {
+            "name": "ChallengeType",
+            "schema": "public",
+            "values": ["static", "dynamic"]
+        },
+        "public.UserType": {
+            "name": "UserType",
+            "schema": "public",
+            "values": ["user", "admin"]
+        }
     },
-    "public.UserType": {
-      "name": "UserType",
-      "schema": "public",
-      "values": [
-        "user",
-        "admin"
-      ]
-    }
-  },
-  "schemas": {},
-  "sequences": {},
-  "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "sequences": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
 }

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
     boolean,
     integer,
@@ -10,7 +11,6 @@ import {
     uniqueIndex,
     varchar,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import type { ChallengeDeploy } from "./types";
 
 export type UserType = "user" | "admin";
@@ -69,10 +69,7 @@ export const challenges = pgTable("challenges", {
 });
 
 export type ChallengeDecayFunction = "linear" | "logarithmic";
-export const ChallengeDecayFunctionEnum = pgEnum("ChallengeDecayFunction", [
-    "linear",
-    "logarithmic",
-]);
+export const ChallengeDecayFunctionEnum = pgEnum("ChallengeDecayFunction", ["linear", "logarithmic"]);
 export const dynamicChallenge = pgTable("dynamic_challenges", {
     id: serial()
         .unique()
@@ -80,9 +77,7 @@ export const dynamicChallenge = pgTable("dynamic_challenges", {
     initial: integer().notNull(),
     minimum: integer().notNull(),
     decay: integer().notNull(),
-    function: ChallengeDecayFunctionEnum()
-        .notNull()
-        .$type<ChallengeDecayFunction>(),
+    function: ChallengeDecayFunctionEnum().notNull().$type<ChallengeDecayFunction>(),
 });
 
 export const runningChallenges = pgTable(
@@ -93,9 +88,7 @@ export const runningChallenges = pgTable(
         user_id: integer().references(() => users.id),
         flag: varchar().notNull(),
         start_time: timestamp().notNull().defaultNow(),
-        end_time: timestamp()
-            .notNull()
-            .default(sql`NOW() + INTERVAL '1 hour'`),
+        end_time: timestamp().notNull().default(sql`NOW() + INTERVAL '1 hour'`),
     },
     (table) => [uniqueIndex().on(table.challenge_id, table.user_id)],
 );

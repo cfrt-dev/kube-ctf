@@ -82,7 +82,7 @@ export type PublicChallengeInfo = {
     files: string[];
     links: Link[] | null;
     startTime?: Date;
-    instanceName?: string;
+    instanceName: string | null;
     isSolved: boolean;
 };
 
@@ -91,14 +91,14 @@ export type User = {
     name: string;
     email: string;
     password: string;
-    team_id?: number;
+    team_id: number | null;
     verified: boolean;
     type: UserType;
-    website?: string;
-    country?: string;
+    website: string | null;
+    country: string | null;
     hidden: boolean;
     banned: boolean;
-    created: string;
+    created: Date;
 };
 
 export type Team = {

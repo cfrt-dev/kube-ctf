@@ -1,23 +1,22 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+import { fromPromise } from "neverthrow";
+import { cookies } from "next/headers";
 import type { ChallengeDeploy, ChallengeDeployValues } from "~/server/db/types";
 import { db } from "../db";
 import { challenges, runningChallenges } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { parseJWT } from "../utils";
 import { generateContainerLinks, generateRandomString } from "./create";
 
-function getChallengeDeployValues(
-    challenge: ChallengeDeploy,
-): ChallengeDeployValues {
+function getChallengeDeployValues(challenge: ChallengeDeploy): ChallengeDeployValues {
     const containerNames = new Set<string | null>();
 
     for (const container of challenge.containers) {
         const containerName = container.name ?? null;
 
         if (containerNames.has(containerName)) {
-            throw new Error(
-                `Duplicate container name: ${containerName ?? "unnamed"}`,
-            );
+            throw new Error(`Duplicate container name: ${containerName ?? "unnamed"}`);
         }
         containerNames.add(containerName);
 
@@ -28,9 +27,7 @@ function getChallengeDeployValues(
                 const portDomain = port.domain ?? null;
 
                 if (portDomains.has(portDomain)) {
-                    throw new Error(
-                        `Duplicate port domain: ${portDomain ?? "no domain"}`,
-                    );
+                    throw new Error(`Duplicate port domain: ${portDomain ?? "no domain"}`);
                 }
                 portDomains.add(portDomain);
             }
@@ -49,11 +46,16 @@ function getChallengeDeployValues(
 }
 
 export async function createInstance(challenge_id: number) {
-    const row = await db
-        .select()
-        .from(challenges)
-        .where(eq(challenges.id, challenge_id))
-        .limit(1);
+    const cookie = await cookies();
+    const tokenString = cookie.get("token")?.value ?? "";
+    const jwt = await parseJWT(tokenString);
+    if (jwt.isErr()) {
+        return;
+    }
+
+    const { id: user_id } = jwt.value;
+
+    const row = await db.select().from(challenges).where(eq(challenges.id, challenge_id)).limit(1);
 
     if (row.length === 0) {
         throw new Error(`Challenge with ID ${challenge_id} not found`);
@@ -61,53 +63,42 @@ export async function createInstance(challenge_id: number) {
 
     const challenge = row[0]!;
     const name = generateRandomString(8);
+    const runningChallengePromise = db
+        .insert(runningChallenges)
+        .values({
+            id: name,
+            challenge_id: challenge_id,
+            user_id,
+            flag: challenge.flag,
+        })
+        .returning({
+            id: runningChallenges.id,
+            start_time: runningChallenges.start_time,
+        });
 
-    let runningChallenge;
-    try {
-        runningChallenge = (
-            await db
-                .insert(runningChallenges)
-                .values({
-                    id: name,
-                    challenge_id: challenge_id,
-                    user_id: 1,
-                    flag: challenge.flag,
-                })
-                .returning({
-                    id: runningChallenges.id,
-                    start_time: runningChallenges.start_time,
-                })
-        )[0]!;
-    } catch (error) {
-        console.log(error);
+    const runningChallenge = await fromPromise(runningChallengePromise, () => ({}));
+
+    if (runningChallenge.isErr()) {
         return;
     }
 
-    await fetch(
-        `https://challenge-manager.cfrt.dev/api/challenge?name=${name}`,
-        {
-            method: "POST",
-            body: JSON.stringify(getChallengeDeployValues(challenge.deploy)),
-        },
-    );
+    await fetch(`https://challenge-manager.cfrt.dev/api/challenge?name=${name}`, {
+        method: "POST",
+        body: JSON.stringify(getChallengeDeployValues(challenge.deploy)),
+    });
 
     const links = generateContainerLinks(challenge.deploy, name);
 
     return {
-        ...runningChallenge,
+        ...runningChallenge.value[0]!,
         links,
     };
 }
 
 export async function deleteInstance(instanceName: string) {
-    await fetch(
-        `https://challenge-manager.cfrt.dev/api/challenge?name=${instanceName}`,
-        {
-            method: "DELETE",
-        },
-    );
+    await fetch(`https://challenge-manager.cfrt.dev/api/challenge?name=${instanceName}`, {
+        method: "DELETE",
+    });
 
-    await db
-        .delete(runningChallenges)
-        .where(eq(runningChallenges.id, instanceName));
+    await db.delete(runningChallenges).where(eq(runningChallenges.id, instanceName));
 }

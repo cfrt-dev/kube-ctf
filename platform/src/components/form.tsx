@@ -1,23 +1,15 @@
 "use client";
 
-import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "~/components/ui/button";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import { Card, CardContent } from "~/components/ui/card";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { type Path, useForm } from "react-hook-form";
-import { type z, type ZodSchema } from "zod";
+import type { ZodSchema, z } from "zod";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 import { capitalize } from "~/lib/utils";
 
 interface AuthFormProps<T extends z.ZodType> {
@@ -50,9 +42,7 @@ export function AuthForm<T extends z.ZodType>({
 
     const form = useForm<z.infer<T>>({
         resolver: zodResolver(schema),
-        defaultValues: Object.fromEntries(
-            fields.map((field) => [field.name, ""]),
-        ) as z.infer<T>,
+        defaultValues: Object.fromEntries(fields.map((field) => [field.name, ""])) as z.infer<T>,
     });
 
     const handleSubmit = async (data: z.infer<T>) => {
@@ -67,10 +57,7 @@ export function AuthForm<T extends z.ZodType>({
             });
         } catch (error) {
             setFormResponse({
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : "Something went wrong. Please try again.",
+                message: error instanceof Error ? error.message : "Something went wrong. Please try again.",
                 success: false,
             });
         } finally {
@@ -80,16 +67,11 @@ export function AuthForm<T extends z.ZodType>({
 
     return (
         <div className="flex flex-col">
-            <h1 className="flex-1 font-bold text-5xl text-center mt-40">
-                {title}
-            </h1>
+            <h1 className="flex-1 font-bold text-5xl text-center mt-40">{title}</h1>
             <Card className="w-full max-w-md mx-auto mt-12">
                 <CardContent className="pt-6">
                     <Form {...form}>
-                        <form
-                            onSubmit={form.handleSubmit(handleSubmit)}
-                            className="space-y-6"
-                        >
+                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                             {fields.map((form_field) => (
                                 <FormField
                                     key={form_field.id}
@@ -97,26 +79,15 @@ export function AuthForm<T extends z.ZodType>({
                                     name={form_field.name as Path<z.infer<T>>}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>
-                                                {capitalize(form_field.name)}
-                                            </FormLabel>
+                                            <FormLabel>{capitalize(form_field.name)}</FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    type={
-                                                        form_field.name ==
-                                                        "username"
-                                                            ? "text"
-                                                            : form_field.name
-                                                    }
-                                                    placeholder={
-                                                        form_field.placeholder
-                                                    }
+                                                    type={form_field.name == "username" ? "text" : form_field.name}
+                                                    placeholder={form_field.placeholder}
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
-                                                {form_field.description}
-                                            </FormDescription>
+                                            <FormDescription>{form_field.description}</FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -124,13 +95,7 @@ export function AuthForm<T extends z.ZodType>({
                             ))}
 
                             {formResponse && (
-                                <Alert
-                                    variant={
-                                        formResponse.success
-                                            ? "default"
-                                            : "destructive"
-                                    }
-                                >
+                                <Alert variant={formResponse.success ? "default" : "destructive"}>
                                     <AlertDescription className="flex items-center gap-x-2">
                                         {formResponse.success ? (
                                             <CheckCircle2 className="h-4 w-4" />
@@ -142,11 +107,7 @@ export function AuthForm<T extends z.ZodType>({
                                 </Alert>
                             )}
 
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={loading}
-                            >
+                            <Button type="submit" className="w-full" disabled={loading}>
                                 {loading ? "Loading..." : submitButtonText}
                             </Button>
                         </form>

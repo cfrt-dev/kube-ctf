@@ -1,4 +1,4 @@
-import { Trophy, Users, User, Settings } from "lucide-react";
+import { Settings, Trophy, User, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 

@@ -1,52 +1,42 @@
-import { type NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { type NextRequest, NextResponse } from "next/server";
 
+import { fromPromise } from "neverthrow";
 import { loginSchema } from "~/app/(auth)/sign-in/form";
-import { createToken } from "~/server/utils";
 import { getUserByEmail } from "~/server/auth/user";
+import { createToken } from "~/server/utils";
 
 export async function POST(req: NextRequest) {
-    let loginForm;
-    try {
-        const body = (await req.json()) as object;
-        loginForm = loginSchema.parse(body);
-    } catch {
+    const requestJson = await fromPromise(req.json(), () => {
+        return NextResponse.json({ message: "Wrong registration body" }, { status: 401 });
+    });
+
+    if (requestJson.isErr()) {
+        return requestJson.error;
+    }
+
+    const loginForm = loginSchema.safeParse(requestJson.value);
+    if (!loginForm.success) {
+        return NextResponse.json({ message: "Wrong registration body" }, { status: 401 });
+    }
+
+    const user = await getUserByEmail(loginForm.data.email);
+
+    if (user.isErr()) {
         return NextResponse.json(
-            { message: "Wrong registration body" },
-            { status: 401 },
+            { message: user.error },
+            { status: user.error !== "Wrong email or password" ? 400 : 501 },
         );
     }
 
-    let user;
-    try {
-        user = await getUserByEmail(loginForm.email);
-    } catch (error) {
-        if (error instanceof Error) {
-            return NextResponse.json(
-                { message: error.message },
-                { status: 409 },
-            );
-        }
-        return NextResponse.json({ status: 501 });
-    }
-
-    const passwordCheck = await bcrypt.compare(
-        loginForm.password,
-        user.password,
-    );
+    const passwordCheck = await bcrypt.compare(loginForm.data.password, user.value.password);
 
     if (passwordCheck === false) {
-        return NextResponse.json(
-            { message: "Wrong username or password" },
-            { status: 403 },
-        );
+        return NextResponse.json({ message: "Wrong username or password" }, { status: 403 });
     }
 
-    const { cookie } = createToken({
-        userId: user.id,
-        username: user.name,
-        type: user.type,
-    });
+    const { id, name, type } = user.value;
+    const { cookie } = createToken({ id, name, type });
 
     return NextResponse.redirect(new URL("/", req.url), {
         headers: { "Set-Cookie": cookie, Location: "/" },

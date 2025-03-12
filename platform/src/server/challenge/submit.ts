@@ -5,10 +5,7 @@ import { db } from "../db";
 import { runningChallenges } from "../db/schema";
 import { deleteInstance } from "./deploy";
 
-export async function submitFlag(
-    instanceId: string,
-    userFlag: string,
-): Promise<boolean> {
+export async function submitFlag(instanceId: string, userFlag: string): Promise<boolean> {
     const row = await db
         .select({ flag: runningChallenges.flag })
         .from(runningChallenges)
@@ -25,9 +22,7 @@ export async function submitFlag(
         return result;
     }
 
-    await db
-        .delete(runningChallenges)
-        .where(eq(runningChallenges.id, instanceId));
+    await db.delete(runningChallenges).where(eq(runningChallenges.id, instanceId));
 
     await deleteInstance(instanceId);
 

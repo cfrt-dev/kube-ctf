@@ -1,21 +1,18 @@
 "use server";
 import bcrypt from "bcryptjs";
 
+import { eq } from "drizzle-orm";
+import { type Result, err, ok } from "neverthrow";
+import type { RegisterFormData } from "~/app/(auth)/sign-up/form";
 import { db } from "../db";
 import { users } from "../db/schema";
 import type { User } from "../db/types";
-import type { RegisterFormData } from "~/app/(auth)/sign-up/form";
-import { eq } from "drizzle-orm";
 
-export async function createUser(user: RegisterFormData): Promise<User> {
-    const result = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, user.email))
-        .limit(1);
+export async function createUser(user: RegisterFormData): Promise<Result<User, string>> {
+    const result = await db.select().from(users).where(eq(users.email, user.email)).limit(1);
 
     if (result.length === 1) {
-        throw new Error("User with this email already exists");
+        return err("User with this email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(user.password, 12);
@@ -29,19 +26,15 @@ export async function createUser(user: RegisterFormData): Promise<User> {
         })
         .returning();
 
-    return rows[0] as unknown as User;
+    return ok(rows[0]!);
 }
 
-export async function getUserByEmail(email: string): Promise<User> {
-    const result = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
+export async function getUserByEmail(email: string): Promise<Result<User, string>> {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (result.length === 0) {
-        throw new Error("Wrong email or password");
+        return err("Wrong email or password");
     }
 
-    return result[0] as unknown as User;
+    return ok(result[0]!);
 }

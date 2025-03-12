@@ -31,8 +31,7 @@ export default function LoginPage() {
         {
             id: 2,
             name: "password",
-            description:
-                "Must be at least 8 characters with uppercase, lowercase and numbers",
+            description: "Must be at least 8 characters with uppercase, lowercase and numbers",
         },
     ];
 

@@ -3,16 +3,9 @@ import { Button } from "~/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 import { UserNav } from "./user-nav";
 
-export default function Header(props: {
-    isAdmin?: boolean;
-    isLoggedIn?: boolean;
-    children: React.ReactNode;
-}) {
+export default function Header(props: { isLoggedIn?: boolean; children: React.ReactNode }) {
     return (
-        <header
-            className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur
-                supports-backdrop-filter:bg-background/60"
-        >
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
             <div className="container mx-auto flex justify-between items-center h-14 px-4">
                 <div className="flex gap-12">
                     <Link href="/" className="font-bold flex items-center">

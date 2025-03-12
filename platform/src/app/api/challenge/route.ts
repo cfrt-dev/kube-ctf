@@ -4,7 +4,7 @@ import { generateContainerLinks } from "~/server/challenge/create";
 
 import { db } from "~/server/db";
 import { challenges, runningChallenges } from "~/server/db/schema";
-import { type Link } from "~/server/db/types";
+import type { Link } from "~/server/db/types";
 import { parseJWT } from "~/server/utils";
 
 export type ChallengeInfo = {
@@ -25,8 +25,11 @@ export async function GET(req: NextRequest) {
     const challengeId = parseInt(challenge_id, 10);
 
     const token = req.cookies.get("token")!;
-    const { jwt } = await parseJWT(token.value);
-    const userId = jwt?.payload.userId;
+    const jwt = await parseJWT(token.value);
+    if (jwt.isErr()) {
+        return;
+    }
+    const { id: userId } = jwt.value;
 
     const result = await db
         .select({
@@ -36,10 +39,7 @@ export async function GET(req: NextRequest) {
         .from(challenges)
         .leftJoin(
             runningChallenges,
-            and(
-                eq(runningChallenges.challenge_id, challenges.id),
-                eq(runningChallenges.user_id, userId!),
-            ),
+            and(eq(runningChallenges.challenge_id, challenges.id), eq(runningChallenges.user_id, userId)),
         )
         .where(eq(challenges.id, challengeId))
         .limit(1);

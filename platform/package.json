@@ -4,20 +4,19 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "next build",
-        "check": "next lint && tsc --noEmit",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:push": "drizzle-kit push",
         "db:studio": "drizzle-kit studio",
         "dev": "next dev",
-        "lint": "next lint",
-        "lint:fix": "next lint --fix",
+        "build": "next build",
         "preview": "next build && next start",
         "start": "next start",
-        "typecheck": "tsc --noEmit",
-        "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
-        "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache"
+        "check": "biome check",
+        "lint": "biome lint",
+        "lint:fix": "biome lint --write",
+        "format": "biome format",
+        "format:fix": "biome format --write"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.10.0",
@@ -43,6 +42,7 @@
         "jose": "^5.9.6",
         "jsonwebtoken": "^9.0.2",
         "lucide-react": "^0.474.0",
+        "neverthrow": "^8.2.0",
         "next": "^15.0.1",
         "next-auth": "^4.24.11",
         "next-themes": "^0.4.4",
@@ -51,32 +51,21 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-hook-form": "^7.54.2",
-        "socket.io": "^4.8.1",
-        "socket.io-client": "^4.8.1",
         "sonner": "^1.7.4",
         "tailwind-merge": "^3.0.1",
         "tailwindcss-animate": "^1.0.7",
-        "tsx": "^4.19.2",
         "zod": "^3.24.1"
     },
     "devDependencies": {
+        "@biomejs/biome": "1.9.4",
         "@types/bcryptjs": "^2.4.6",
-        "@types/eslint": "^8.56.10",
         "@types/jsonwebtoken": "^9.0.8",
         "@types/node": "^20.14.10",
         "@types/pg": "^8.11.11",
         "@types/react": "^18.3.3",
         "@types/react-dom": "^18.3.0",
-        "@typescript-eslint/eslint-plugin": "^8.1.0",
-        "@typescript-eslint/parser": "^8.1.0",
         "drizzle-kit": "^0.30.4",
-        "eslint": "^8.57.0",
-        "eslint-config-next": "^15.0.1",
-        "eslint-plugin-drizzle": "^0.2.3",
         "postcss": "^8.4.39",
-        "prettier": "^3.4.2",
-        "prettier-plugin-classnames": "^0.7.6",
-        "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^3.4.3",
         "typescript": "^5.5.3"
     },
@@ -84,9 +73,6 @@
         "initVersion": "7.38.1"
     },
     "pnpm": {
-        "onlyBuiltDependencies": [
-            "esbuild",
-            "sharp"
-        ]
+        "onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "sharp"]
     }
 }

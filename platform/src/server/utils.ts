@@ -1,17 +1,19 @@
 import { serialize } from "cookie";
-import jwt from "jsonwebtoken";
 import * as jose from "jose";
+import jwt from "jsonwebtoken";
+import { type Result, err, fromPromise, ok } from "neverthrow";
 import { env } from "~/env";
+import type { UserType } from "./db/types";
 
 export interface JWTClaim {
-    userId: number;
-    username: string;
-    type: "user" | "admin";
+    id: number;
+    name: string;
+    type: UserType;
 }
 
 const secretKey = new TextEncoder().encode(env.AUTH_SECRET);
 
-export function createToken(object: object): { token: string; cookie: string } {
+export function createToken(object: JWTClaim): { token: string; cookie: string } {
     const token = jwt.sign(object, env.AUTH_SECRET, { expiresIn: "24h" });
 
     const cookie = serialize("token", token, {
@@ -24,19 +26,12 @@ export function createToken(object: object): { token: string; cookie: string } {
     return { token, cookie };
 }
 
-export async function parseJWT(
-    token: string,
-): Promise<{ verified: boolean; jwt: jose.JWTVerifyResult<JWTClaim> | null }> {
-    try {
-        const result = await jose.jwtVerify<JWTClaim>(token, secretKey);
-        return {
-            verified: true,
-            jwt: result,
-        };
-    } catch {
-        return {
-            verified: false,
-            jwt: null,
-        };
+export async function parseJWT(token: string): Promise<Result<JWTClaim, null>> {
+    const result = await fromPromise(jose.jwtVerify<JWTClaim>(token, secretKey), () => null);
+
+    if (result.isErr()) {
+        return err(result.error);
     }
+
+    return ok(result.value.payload);
 }
