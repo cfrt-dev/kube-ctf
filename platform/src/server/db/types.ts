@@ -82,7 +82,7 @@ export type PublicChallengeInfo = {
     files: string[];
     links: Link[] | null;
     startTime?: Date;
-    instanceName: string | null;
+    instanceName?: string;
     isSolved: boolean;
 };
 

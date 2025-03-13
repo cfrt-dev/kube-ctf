@@ -1,6 +1,7 @@
 "use client";
 
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -11,101 +12,102 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "~/components/ui/input";
 import { cn } from "~/lib/utils";
 import { createInstance, deleteInstance } from "~/server/challenge/deploy";
+import { getChallengeInfo } from "~/server/challenge/get";
 import { submitFlag } from "~/server/challenge/submit";
 import type { PublicChallengeInfo } from "~/server/db/types";
-import type { ChallengeInfo } from "../app/api/challenge/route";
 import ChallengeLink from "./challenge-link";
 
 export default function ChallengeComponent(props: { initialChallenge: PublicChallengeInfo }) {
     const { initialChallenge } = props;
-    const [challenge, setChallenge] = useState(initialChallenge);
-    const [isRunning, setIsRunning] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [answer, setAnswer] = useState("");
+    const queryClient = useQueryClient();
 
-    const handleStartInstance = async () => {
-        setIsLoading(true);
+    const { data: challengeData } = useQuery({
+        queryKey: ["challenge", initialChallenge.id],
+        queryFn: () => getChallengeInfo(initialChallenge.id),
+        initialData: initialChallenge,
+        enabled: dialogOpen,
+    });
 
-        const runningChallenge = await createInstance(initialChallenge.id);
-        setChallenge({
-            ...challenge,
-            links: runningChallenge!.links,
-            instanceName: runningChallenge!.id,
-        });
-        setIsRunning(true);
-        setIsLoading(false);
-    };
+    const challenge = challengeData ?? initialChallenge;
 
-    const handleStopInstance = async () => {
-        void deleteInstance(challenge.instanceName!);
-        setIsRunning(false);
-        setAnswer("");
-    };
+    const startInstanceMutation = useMutation({
+        mutationFn: () => createInstance(initialChallenge.id),
+        onSuccess: (data) => {
+            queryClient.setQueryData(
+                ["challenge", initialChallenge.id],
+                (oldData: PublicChallengeInfo | undefined): PublicChallengeInfo => ({
+                    ...(oldData ?? initialChallenge),
+                    links: data!.links,
+                    instanceName: data!.id,
+                }),
+            );
+            setAnswer("");
+        },
+        onError: () => toast.error("Failed to start instance"),
+    });
 
-    const handleFlagSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        const result = await submitFlag(challenge.instanceName!, answer);
-        if (!result) {
-            toast.error("Wrong flag");
-            return;
-        }
+    const stopInstanceMutation = useMutation({
+        mutationFn: (instanceName: string) => deleteInstance(instanceName),
+        onSuccess: () => {
+            queryClient.setQueryData(
+                ["challenge", initialChallenge.id],
+                (oldData: PublicChallengeInfo | undefined): PublicChallengeInfo => ({
+                    ...(oldData ?? initialChallenge),
+                    links: null,
+                    instanceName: undefined,
+                }),
+            );
+            setAnswer("");
+        },
+        onError: () => toast.error("Failed to stop instance"),
+    });
 
-        toast.success("Correct flag");
-        setIsRunning(false);
-        setChallenge({
-            ...challenge,
-            isSolved: true,
-        });
-        setAnswer("");
-        setDialogOpen(false);
-    };
+    const submitFlagMutation = useMutation({
+        mutationFn: ({ instanceName, flag }: { instanceName: string; flag: string }) => submitFlag(instanceName, flag),
+        onSuccess: (result) => {
+            if (!result) {
+                toast.error("Wrong flag");
+                return;
+            }
+
+            toast.success("Correct flag");
+            queryClient.setQueryData(
+                ["challenge", initialChallenge.id],
+                (oldData: PublicChallengeInfo | undefined): PublicChallengeInfo => ({
+                    ...(oldData ?? initialChallenge),
+                    isSolved: true,
+                    links: null,
+                    instanceName: undefined,
+                }),
+            );
+            setAnswer("");
+            setDialogOpen(false);
+        },
+        onError: () => toast.error("Failed to submit flag"),
+    });
+
+    const isRunning = !!challenge.instanceName;
 
     const handleCopyUrl = (url: string) => {
         void navigator.clipboard.writeText(url);
         toast("URL copied to clipboard");
     };
 
-    useEffect(() => {
-        if (window.location.hash === `#${challenge.id}`) {
-            setDialogOpen(true);
+    const handleFlagSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (challenge.instanceName) {
+            submitFlagMutation.mutate({ instanceName: challenge.instanceName, flag: answer });
         }
-    }, [challenge.id]);
-
-    useEffect(() => {
-        if (dialogOpen === false) return;
-
-        const fetchData = async () => {
-            const { isRunning, instanceName, links, startTime } = await fetch(`/api/challenge?id=${challenge.id}`)
-                .then((response) => response.json())
-                .then((response) => response as ChallengeInfo);
-
-            setIsRunning(isRunning);
-            if (isRunning) {
-                setChallenge({
-                    ...challenge,
-                    instanceName: instanceName!,
-                    links: links!,
-                    startTime: startTime,
-                });
-            }
-        };
-
-        fetchData().catch((error) => {
-            console.error("Error fetching challenge info:", error);
-        });
-    }, [dialogOpen]);
+    };
 
     const handleCardClick = () => {
-        window.location.hash = challenge.id.toString();
         setDialogOpen(true);
     };
 
     const handleDialogOpenChange = (open: boolean) => {
         setDialogOpen(open);
-        if (!open) {
-            history.replaceState(null, "", window.location.pathname);
-        }
     };
 
     return (
@@ -163,22 +165,23 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
                 {isRunning ? (
                     <>
                         <div className="space-y-2">
-                            {challenge.links!.map((link, index) => {
-                                return (
-                                    <ChallengeLink
-                                        key={index}
-                                        url={{
-                                            url: link.url,
-                                            protocol: link.protocol,
-                                        }}
-                                        onCopy={() => handleCopyUrl(link.url)}
-                                    />
-                                );
-                            })}
+                            {challenge.links!.map((link, index) => (
+                                <ChallengeLink
+                                    key={index}
+                                    url={{ url: link.url, protocol: link.protocol }}
+                                    onCopy={() => handleCopyUrl(link.url)}
+                                />
+                            ))}
                         </div>
                         <div className=""></div>
                         <div className="flex flex-col">
-                            <Button onClick={handleStopInstance} variant="destructive">
+                            <Button
+                                onClick={() =>
+                                    challenge.instanceName && stopInstanceMutation.mutate(challenge.instanceName)
+                                }
+                                variant="destructive"
+                            >
+                                {stopInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Stop Instance
                             </Button>
                         </div>
@@ -189,14 +192,15 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
                                 placeholder="Enter flag here..."
                                 onChange={(e) => setAnswer(e.target.value)}
                             ></Input>
-                            <Button type="submit" className="w-full">
+                            <Button type="submit" className="w-full" disabled={submitFlagMutation.isLoading}>
+                                {stopInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Submit Flag
                             </Button>
                         </form>
                     </>
                 ) : (
-                    <Button onClick={handleStartInstance} variant="default">
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button onClick={() => startInstanceMutation.mutate()} variant="default">
+                        {startInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Start Instance
                     </Button>
                 )}

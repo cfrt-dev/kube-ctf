@@ -1,5 +1,6 @@
 "use client";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Fuse from "fuse.js";
 import { useMemo } from "react";
 import type { PublicChallengeInfo } from "~/server/db/types";
@@ -9,6 +10,8 @@ import { useFilter } from "./challenge-filter-context";
 interface ChallengeListProps {
     challenges: PublicChallengeInfo[];
 }
+
+const queryClient = new QueryClient();
 
 export default function ChallengeList({ challenges }: ChallengeListProps) {
     const { showSolved, searchQuery, selectedCategories } = useFilter();
@@ -42,10 +45,10 @@ export default function ChallengeList({ challenges }: ChallengeListProps) {
     }, [challenges, searchQuery, selectedCategories, showSolved, fuse]);
 
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
             {filteredChallenges.map((challenge, index) => (
                 <Challenge key={index} initialChallenge={challenge} />
             ))}
-        </>
+        </QueryClientProvider>
     );
 }

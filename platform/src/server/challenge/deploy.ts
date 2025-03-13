@@ -52,8 +52,7 @@ export async function createInstance(challenge_id: number) {
     if (jwt.isErr()) {
         return;
     }
-
-    const { id: user_id } = jwt.value;
+    const user_id = jwt.value.id;
 
     const row = await db.select().from(challenges).where(eq(challenges.id, challenge_id)).limit(1);
 

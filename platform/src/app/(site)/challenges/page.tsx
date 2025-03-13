@@ -26,11 +26,6 @@ export default async function ChallengesPage() {
         .from(challenges)
         .where(eq(challenges.hidden, false));
 
-    const foo = [];
-    for (let i = 0; i < 20; i++) {
-        foo.push(rows[0]!);
-    }
-
     return (
         <div className="container py-8 mx-auto h-[calc(100vh-57px)] flex flex-col">
             <div className="flex gap-8 flex-1 overflow-auto ">
@@ -46,7 +41,7 @@ export default async function ChallengesPage() {
                         <div className="flex-1 overflow-y-auto p-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <Suspense>
-                                    <ChallengeList challenges={foo} />
+                                    <ChallengeList challenges={rows} />
                                 </Suspense>
                             </div>
                         </div>

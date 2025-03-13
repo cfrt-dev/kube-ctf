@@ -33,6 +33,7 @@
         "@radix-ui/react-toast": "^1.2.6",
         "@radix-ui/react-tooltip": "^1.1.8",
         "@t3-oss/env-nextjs": "^0.10.1",
+        "@tanstack/react-query": "4",
         "babel-plugin-react-compiler": "19.0.0-beta-714736e-20250131",
         "bcryptjs": "^2.4.3",
         "class-variance-authority": "^0.7.1",
