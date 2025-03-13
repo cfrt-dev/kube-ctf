@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "~/components/theme-provider";
+import { StrictMode } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +16,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
-                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                    {children}
-                </ThemeProvider>
+                <StrictMode>
+                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+                        {children}
+                    </ThemeProvider>
+                </StrictMode>
             </body>
         </html>
     );
