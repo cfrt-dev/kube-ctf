@@ -129,9 +129,7 @@ export default function SearchableTable({ data, initialSearch }: SearchableTable
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
-        debounce((value: string) => {
-            updateUrl(value);
-        }, 300);
+        updateUrl(value);
     };
 
     const table = useReactTable({

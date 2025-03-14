@@ -1,9 +1,9 @@
-import { sql } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import Link from "next/link";
 import SortableTable from "~/components/sortable-table";
 import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
-import { challenges } from "~/server/db/schema";
+import { challenges, submissions } from "~/server/db/schema";
 
 export default async function Page({
     searchParams,
@@ -19,11 +19,13 @@ export default async function Page({
             name: challenges.name,
             category: challenges.category,
             points: challenges.value,
-            solves: sql<number>`0`,
+            solves: count(submissions.id),
             author: challenges.author,
             hidden: challenges.hidden,
         })
-        .from(challenges);
+        .from(challenges)
+        .leftJoin(submissions, and(eq(submissions.challenge_id, challenges.id), eq(submissions.type, true)))
+        .groupBy(challenges.id);
 
     return (
         <div className="flex flex-col h-[calc(100vh-16px)]">

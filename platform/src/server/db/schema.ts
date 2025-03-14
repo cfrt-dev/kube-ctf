@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
     boolean,
+    index,
     integer,
     jsonb,
     pgEnum,
@@ -91,4 +92,18 @@ export const runningChallenges = pgTable(
         end_time: timestamp().notNull().default(sql`NOW() + INTERVAL '1 hour'`),
     },
     (table) => [uniqueIndex().on(table.challenge_id, table.user_id)],
+);
+
+export const submissions = pgTable(
+    "submissions",
+    {
+        id: serial().primaryKey(),
+        user_id: integer().references(() => users.id),
+        team_id: integer().references(() => teams.id),
+        challenge_id: integer().references(() => challenges.id),
+        type: boolean(),
+        answer: varchar().notNull(),
+        submited_at: timestamp().notNull().defaultNow(),
+    },
+    (table) => [index().on(table.challenge_id)],
 );

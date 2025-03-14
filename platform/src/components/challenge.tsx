@@ -2,7 +2,7 @@
 
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
@@ -65,7 +65,8 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
     });
 
     const submitFlagMutation = useMutation({
-        mutationFn: ({ instanceName, flag }: { instanceName: string; flag: string }) => submitFlag(instanceName, flag),
+        mutationFn: ({ instanceName, flag }: { instanceName: string; flag: string }) =>
+            submitFlag(challenge.id, instanceName, flag),
         onSuccess: (result) => {
             if (!result) {
                 toast.error("Wrong flag");
@@ -83,7 +84,6 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
                 }),
             );
             setAnswer("");
-            setDialogOpen(false);
         },
         onError: () => toast.error("Failed to submit flag"),
     });
@@ -198,11 +198,18 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
                             </Button>
                         </form>
                     </>
-                ) : (
+                ) : !challenge.isSolved ? (
                     <Button onClick={() => startInstanceMutation.mutate()} variant="default">
                         {startInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Start Instance
                     </Button>
+                ) : (
+                    <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+                        <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 justify-center">
+                            <CheckCircle className="h-4 w-4" />
+                            <span>You've already solved this challenge!</span>
+                        </div>
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

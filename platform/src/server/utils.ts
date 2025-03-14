@@ -6,7 +6,8 @@ import { env } from "~/env";
 import type { UserType } from "./db/types";
 
 export interface JWTClaim {
-    id: number;
+    user_id: number;
+    team_id: number | null;
     name: string;
     type: UserType;
 }

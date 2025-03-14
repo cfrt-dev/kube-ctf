@@ -1,9 +1,9 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db } from "~/server/db";
-import { challenges, runningChallenges } from "~/server/db/schema";
+import { challenges, runningChallenges, submissions } from "~/server/db/schema";
 import type { PublicChallengeInfo } from "~/server/db/types";
 import { parseJWT } from "~/server/utils";
 import { generateContainerLinks } from "./create";
@@ -13,24 +13,33 @@ export async function getChallengeInfo(challengeId: number): Promise<PublicChall
     const token = cookie.get("token")?.value ?? "";
     const jwt = await parseJWT(token);
     if (jwt.isErr()) return null;
-    const userId = jwt.value.id;
+    const userId = jwt.value.user_id;
 
     const result = await db
         .select({
             challenge: challenges,
             runningChallenge: runningChallenges,
+            isSolved: sql<boolean>`${submissions.id} IS NOT NULL`,
         })
         .from(challenges)
         .leftJoin(
             runningChallenges,
             and(eq(runningChallenges.challenge_id, challenges.id), eq(runningChallenges.user_id, userId)),
         )
+        .leftJoin(
+            submissions,
+            and(
+                eq(submissions.challenge_id, challenges.id),
+                eq(submissions.user_id, userId),
+                eq(submissions.type, true),
+            ),
+        )
         .where(eq(challenges.id, challengeId))
         .limit(1);
 
     if (result.length === 0 || result[0] === undefined) return null;
 
-    const { challenge, runningChallenge } = result[0];
+    const { challenge, runningChallenge, isSolved } = result[0];
     const challengeInfo: PublicChallengeInfo = {
         id: challenge.id,
         name: challenge.name,
@@ -44,7 +53,7 @@ export async function getChallengeInfo(challengeId: number): Promise<PublicChall
         links: null,
         startTime: undefined,
         instanceName: undefined,
-        isSolved: false,
+        isSolved,
     };
 
     if (runningChallenge !== null) {

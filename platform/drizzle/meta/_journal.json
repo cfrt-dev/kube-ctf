@@ -64,6 +64,13 @@
             "when": 1739211240757,
             "tag": "0008_rich_mac_gargan",
             "breakpoints": true
+        },
+        {
+            "idx": 9,
+            "version": "7",
+            "when": 1741946120154,
+            "tag": "0009_rare_chamber",
+            "breakpoints": true
         }
     ]
 }
