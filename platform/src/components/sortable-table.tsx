@@ -16,8 +16,8 @@ type ChallengeRow = {
     category: string;
     points: number;
     solves: number;
-    author: string;
-    status: string;
+    author: string | null;
+    hidden: boolean;
 };
 
 interface SearchableTableProps {
@@ -77,12 +77,12 @@ export default function SearchableTable({ data, initialSearch }: SearchableTable
                     cell: (info) => info.getValue(),
                     size: 150,
                 }),
-                columnHelper.accessor("status", {
+                columnHelper.accessor("hidden", {
                     header: () => "Status",
                     cell: (info) => {
-                        const status = info.getValue();
-                        const variant = status === "hidden" ? "secondary" : "default";
-                        const text = status === "hidden" ? "Hidden" : "Visible";
+                        const hidden = info.getValue();
+                        const variant = hidden ? "secondary" : "default";
+                        const text = hidden ? "Hidden" : "Visible";
                         return <Badge variant={variant}>{text}</Badge>;
                     },
                     size: 100,

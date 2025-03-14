@@ -1,27 +1,9 @@
+import { sql } from "drizzle-orm";
 import Link from "next/link";
 import SortableTable from "~/components/sortable-table";
 import { Button } from "~/components/ui/button";
-
-const challenges = [
-    {
-        id: 1,
-        name: "Web Exploitation 101",
-        category: "web",
-        points: 100,
-        solves: 5,
-        author: "admin",
-        status: "visible",
-    },
-    {
-        id: 2,
-        name: "Buffer Overflow Basic",
-        category: "pwn",
-        points: 200,
-        solves: 2,
-        author: "admin",
-        status: "hidden",
-    },
-];
+import { db } from "~/server/db";
+import { challenges } from "~/server/db/schema";
 
 export default async function Page({
     searchParams,
@@ -31,6 +13,17 @@ export default async function Page({
     }>;
 }) {
     const { search } = await searchParams;
+    const rows = await db
+        .select({
+            id: challenges.id,
+            name: challenges.name,
+            category: challenges.category,
+            points: challenges.value,
+            solves: sql<number>`0`,
+            author: challenges.author,
+            hidden: challenges.hidden,
+        })
+        .from(challenges);
 
     return (
         <div className="flex flex-col h-[calc(100vh-16px)]">
@@ -43,7 +36,7 @@ export default async function Page({
                 </div>
             </div>
             <div className="flex-1 px-6 pb-6 overflow-hidden">
-                <SortableTable data={challenges} initialSearch={search || ""} />
+                <SortableTable data={rows} initialSearch={search || ""} />
             </div>
         </div>
     );
