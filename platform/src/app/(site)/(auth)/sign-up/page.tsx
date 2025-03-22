@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AuthForm } from "~/components/form";
+import { AuthForm } from "~/components/auth-form";
 import { type RegisterFormData, registerSchema } from "./form";
 
 export default function LoginPage() {

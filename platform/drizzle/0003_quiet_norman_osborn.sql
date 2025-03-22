@@ -1,1 +1,0 @@
-ALTER TABLE "challenges" ADD COLUMN "value" integer NOT NULL;

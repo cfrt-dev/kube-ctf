@@ -12,7 +12,7 @@ import {
     uniqueIndex,
     varchar,
 } from "drizzle-orm/pg-core";
-import type { ChallengeDeploy } from "./types";
+import type { ChallengeDeploy, ChallengeFile } from "./types";
 
 export type UserType = "user" | "admin";
 export const UserTypeEnum = pgEnum("UserType", ["user", "admin"]);
@@ -51,34 +51,36 @@ export const teams = pgTable("teams", {
     created: timestamp().notNull().defaultNow(),
 });
 
-export type ChallengeType = "static" | "dynamic";
-export const ChallengeTypeEnum = pgEnum("ChallengeType", ["static", "dynamic"]);
+export type ChallengeType = "Static" | "Dynamic";
+export const ChallengeTypeEnum = pgEnum("ChallengeType", ["Static", "Dynamic"]);
 export const challenges = pgTable("challenges", {
     id: serial().primaryKey(),
     name: varchar().notNull(),
-    category: varchar().notNull(),
     flag: varchar().notNull(),
-    type: ChallengeTypeEnum().notNull().default("static"),
-    value: integer().notNull(),
-    author: varchar(),
-    description: text(),
-    hints: varchar().array().notNull().$type<string[]>().default([]),
-    dynamicFlag: boolean().notNull().default(false),
+    author: varchar().notNull(),
+    category: varchar().notNull(),
+    description: text().notNull(),
+    type: ChallengeTypeEnum().notNull().$type<ChallengeType>(),
+    points: integer().notNull(),
+    initialPoints: integer().notNull(),
     hidden: boolean().notNull().default(false),
-    files: boolean().array().notNull().$type<string[]>().default([]),
-    deploy: jsonb().notNull().$type<ChallengeDeploy>(),
+    dynamicFlag: boolean().notNull().default(false),
+    hints: varchar().array().notNull().$type<string[]>().default([]),
+    files: jsonb().notNull().$type<ChallengeFile[]>(),
+    deployType: ChallengeTypeEnum().notNull().default("Static").$type<ChallengeType>(),
+    deploy: jsonb().$type<ChallengeDeploy>(),
 });
 
-export type ChallengeDecayFunction = "linear" | "logarithmic";
-export const ChallengeDecayFunctionEnum = pgEnum("ChallengeDecayFunction", ["linear", "logarithmic"]);
-export const dynamicChallenge = pgTable("dynamic_challenges", {
-    id: serial()
+export type ChallengeDecayFunction = "Linear" | "Logarithmic";
+export const ChallengeDecayFunctionEnum = pgEnum("ChallengeDecayFunction", ["Linear", "Logarithmic"]);
+export const dynamicChallenges = pgTable("dynamicChallenges", {
+    id: integer()
         .unique()
+        .notNull()
         .references(() => challenges.id),
-    initial: integer().notNull(),
-    minimum: integer().notNull(),
-    decay: integer().notNull(),
-    function: ChallengeDecayFunctionEnum().notNull().$type<ChallengeDecayFunction>(),
+    minimum: integer(),
+    decay: integer(),
+    type: ChallengeDecayFunctionEnum().$type<ChallengeDecayFunction>(),
 });
 
 export const runningChallenges = pgTable(

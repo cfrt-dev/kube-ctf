@@ -8,15 +8,7 @@ import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { useFilter } from "./challenge-filter-context";
 
-const categories = [
-    { key: "web", name: "Web" },
-    { key: "pwn", name: "Pwn" },
-    { key: "crypto", name: "Crypto" },
-    { key: "forensics", name: "Forensics" },
-    { key: "misc", name: "Misc" },
-];
-
-export default function ChallengesFilter() {
+export default function ChallengesFilter({ categories }: { categories: { name: string }[] }) {
     const {
         showSolved,
         setShowSolved,
@@ -68,6 +60,7 @@ export default function ChallengesFilter() {
                 />
                 {searchQuery && (
                     <button
+                        type="button"
                         onClick={() => setSearchQuery("")}
                         className="absolute right-2 top-2.5 h-5 w-5 rounded-full text-muted-foreground hover:text-foreground "
                         aria-label="Clear search"
@@ -96,19 +89,19 @@ export default function ChallengesFilter() {
                         </Button>
                     </div>
                     <div className="grid gap-2">
-                        {categories.map((category) => (
-                            <div key={category.key} className="flex gap-2">
+                        {categories.map(({ name }) => (
+                            <div key={name} className="flex gap-2">
                                 <Button
-                                    variant={selectedCategories.includes(category.key) ? "default" : "outline"}
+                                    variant={selectedCategories.includes(name) ? "default" : "outline"}
                                     className="justify-start flex-1 h-10"
-                                    onClick={() => handleCategoryClick(category.key)}
+                                    onClick={() => handleCategoryClick(name)}
                                 >
-                                    {category.name}
+                                    {name}
                                 </Button>
                                 <Button
-                                    variant={selectedCategories.includes(category.key) ? "default" : "outline"}
+                                    variant={selectedCategories.includes(name) ? "default" : "outline"}
                                     className="h-10 w-10"
-                                    onClick={(e) => handleCategoryAdd(e, category.key)}
+                                    onClick={(e) => handleCategoryAdd(e, name)}
                                 >
                                     <Plus className="h-4 w-4" />
                                 </Button>

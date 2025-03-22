@@ -1,6 +1,6 @@
-import { ChartColumnBig, CircleUser, Flag, Settings, SquareArrowLeft, Users } from "lucide-react";
+import { ChartColumnBig, CircleUser, Flag, Settings, Users } from "lucide-react";
 import Link from "next/link";
-import { StrictMode } from "react";
+import ThemedToast from "~/components/themed-toast";
 import {
     Sidebar,
     SidebarGroup,
@@ -13,7 +13,14 @@ import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <StrictMode>
+        <>
+            <style>
+                {`
+                body {
+                    background: #18181b;
+                }
+                `}
+            </style>
             <SidebarProvider
                 style={
                     {
@@ -66,6 +73,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 </Sidebar>
                 <SidebarInset>{children}</SidebarInset>
             </SidebarProvider>
-        </StrictMode>
+            <ThemedToast />
+        </>
     );
 }

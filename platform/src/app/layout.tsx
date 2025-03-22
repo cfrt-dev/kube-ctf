@@ -2,13 +2,12 @@ import "~/styles/globals.css";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { StrictMode } from "react";
 import { ThemeProvider } from "~/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Kube CTF",
+    title: "KubeCTF",
     icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -16,11 +15,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={inter.className}>
-                <StrictMode>
-                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                        {children}
-                    </ThemeProvider>
-                </StrictMode>
+                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );

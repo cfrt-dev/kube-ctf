@@ -1,31 +1,76 @@
 "use client";
 
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { nanoid } from "nanoid";
 import { type FormEvent, useState } from "react";
+import Markdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { gruvboxDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import { Card, CardHeader, CardTitle } from "~/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
-import { cn } from "~/lib/utils";
-import { createInstance, deleteInstance } from "~/server/challenge/deploy";
-import { getChallengeInfo } from "~/server/challenge/get";
 import { submitFlag } from "~/server/challenge/submit";
-import type { PublicChallengeInfo } from "~/server/db/types";
+import type { Link, PublicChallengeInfo } from "~/server/db/types";
+import { ChallengeFiles } from "./challenge-files";
 import ChallengeLink from "./challenge-link";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
-export default function ChallengeComponent(props: { initialChallenge: PublicChallengeInfo }) {
-    const { initialChallenge } = props;
+interface ChallengeComponentProps {
+    initialChallengeFunc: () => PublicChallengeInfo;
+    getInfo: (id: number) => Promise<PublicChallengeInfo | null>;
+    createInstance: (id: number) => Promise<
+        | {
+              links: Link[];
+              id: string;
+              start_time: Date;
+          }
+        | undefined
+    >;
+    deleteInstance: (id: string) => Promise<void>;
+    trigger: (challenge: PublicChallengeInfo) => React.ReactNode;
+}
+
+export function DescriptionMarkdown({ markdown }: { markdown: string }) {
+    return (
+        <Markdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            components={{
+                code({ node, inline, className, children, ...props }: any) {
+                    const match = /language-(\w+)/.exec(className || "");
+
+                    return !inline && match ? (
+                        <SyntaxHighlighter style={gruvboxDark} PreTag="div" language={match[1]} {...props}>
+                            {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
+                    ) : (
+                        <code className={className} {...props}>
+                            {children}
+                        </code>
+                    );
+                },
+            }}
+        >
+            {markdown}
+        </Markdown>
+    );
+}
+
+export default function ChallengeComponent(props: ChallengeComponentProps) {
+    const { initialChallengeFunc, getInfo, trigger, createInstance, deleteInstance } = props;
     const [dialogOpen, setDialogOpen] = useState(false);
     const [answer, setAnswer] = useState("");
     const queryClient = useQueryClient();
+    const initialChallenge = initialChallengeFunc();
 
-    const { data: challengeData } = useQuery({
+    const { data: challengeData, error } = useQuery({
         queryKey: ["challenge", initialChallenge.id],
-        queryFn: () => getChallengeInfo(initialChallenge.id),
+        queryFn: () => getInfo(initialChallenge.id),
         initialData: initialChallenge,
         enabled: dialogOpen,
     });
@@ -35,14 +80,15 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
     const startInstanceMutation = useMutation({
         mutationFn: () => createInstance(initialChallenge.id),
         onSuccess: (data) => {
-            queryClient.setQueryData(
-                ["challenge", initialChallenge.id],
-                (oldData: PublicChallengeInfo | undefined): PublicChallengeInfo => ({
-                    ...(oldData ?? initialChallenge),
-                    links: data!.links,
-                    instanceName: data!.id,
-                }),
-            );
+            queryClient.setQueryData(["challenge", initialChallenge.id], (oldData: PublicChallengeInfo | undefined) => {
+                if (data !== undefined) {
+                    return {
+                        ...(oldData ?? initialChallenge),
+                        links: data.links,
+                        instanceName: data.id,
+                    };
+                }
+            });
             setAnswer("");
         },
         onError: () => toast.error("Failed to start instance"),
@@ -65,7 +111,7 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
     });
 
     const submitFlagMutation = useMutation({
-        mutationFn: ({ instanceName, flag }: { instanceName: string; flag: string }) =>
+        mutationFn: ({ instanceName, flag }: { instanceName: string | undefined; flag: string }) =>
             submitFlag(challenge.id, instanceName, flag),
         onSuccess: (result) => {
             if (!result) {
@@ -97,13 +143,7 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
 
     const handleFlagSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (challenge.instanceName) {
-            submitFlagMutation.mutate({ instanceName: challenge.instanceName, flag: answer });
-        }
-    };
-
-    const handleCardClick = () => {
-        setDialogOpen(true);
+        submitFlagMutation.mutate({ instanceName: challenge.instanceName, flag: answer });
     };
 
     const handleDialogOpenChange = (open: boolean) => {
@@ -112,104 +152,112 @@ export default function ChallengeComponent(props: { initialChallenge: PublicChal
 
     return (
         <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
-            <DialogTrigger asChild className="w-72">
-                <Card
-                    key={challenge.id}
-                    onClick={handleCardClick}
-                    className={cn(
-                        "cursor-pointer transition-all hover:bg-muted/50 h-[160px] w-full",
-                        challenge.isSolved &&
-                            "bg-emerald-400/20 border-emerald-400/40 dark:bg-emerald-400/10 dark:border-emerald-400/30",
-                    )}
-                >
-                    <CardHeader className="p-6 h-full flex flex-col justify-between">
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg line-clamp-1">{challenge.name}</CardTitle>
-                                <div
-                                    className={cn(
-                                        "font-medium text-base",
-                                        challenge.isSolved && "text-emerald-500 dark:text-emerald-300",
-                                    )}
-                                >
-                                    {challenge.currentValue}
+            {trigger(challenge)}
+            <DialogContent
+                className="sm:max-w-[600px] focus-visible:outline-hidden overflow-y-auto max-h-screen"
+                aria-describedby={undefined}
+            >
+                {error ? (
+                    <div className="py-8">
+                        <Alert variant="destructive">
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>{error.message}</AlertDescription>
+                        </Alert>
+                    </div>
+                ) : (
+                    <>
+                        <DialogHeader className="text-center space-y-2">
+                            <DialogTitle className="text-2xl font-bold">{challenge.name}</DialogTitle>
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="text-lg">
+                                    {challenge.value.points || challenge.value.initialPoints} points
                                 </div>
                             </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{challenge.description}</p>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                                {challenge.category}
-                            </Badge>
-                            {challenge.isSolved && (
-                                <Badge variant="default" className="bg-emerald-500 text-xs">
-                                    Solved
-                                </Badge>
-                            )}
-                        </div>
-                    </CardHeader>
-                </Card>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] focus-visible:outline-hidden">
-                <DialogHeader className="text-center space-y-2">
-                    <DialogTitle className="text-2xl font-bold">{challenge.name}</DialogTitle>
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="text-lg">{challenge.currentValue} points</div>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                        {challenge.author && <Badge variant="outline">By @{challenge.author}</Badge>}
-                        <Badge variant="default">Dynamic</Badge>
-                    </div>
-                </DialogHeader>
-                <DialogDescription>{challenge.description}</DialogDescription>
-                {isRunning ? (
-                    <>
-                        <div className="space-y-2">
-                            {challenge.links!.map((link, index) => (
-                                <ChallengeLink
-                                    key={index}
-                                    url={{ url: link.url, protocol: link.protocol }}
-                                    onCopy={() => handleCopyUrl(link.url)}
+                            <div className="flex items-center justify-center gap-2 mt-2">
+                                {challenge.author && <Badge variant="outline">By @{challenge.author}</Badge>}
+                            </div>
+                        </DialogHeader>
+
+                        <DescriptionMarkdown markdown={challenge.description ?? ""} />
+
+                        {challenge.files && challenge.files.length > 0 && <ChallengeFiles files={challenge.files} />}
+
+                        {challenge.links && (
+                            <div className="space-y-2">
+                                {challenge.links
+                                    .map((link) => ({ link, id: nanoid(7) }))
+                                    .map(({ link, id }) => (
+                                        <ChallengeLink
+                                            key={id}
+                                            url={{ url: link.url, protocol: link.protocol }}
+                                            onCopy={() => handleCopyUrl(link.url)}
+                                        />
+                                    ))}
+                            </div>
+                        )}
+
+                        {challenge.isSolved ? (
+                            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+                                <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 justify-center">
+                                    <CheckCircle className="h-4 w-4" />
+                                    <span>You've already solved this challenge!</span>
+                                </div>
+                            </div>
+                        ) : challenge.deployType === "Static" ? (
+                            <form onSubmit={handleFlagSubmit} className="space-y-4">
+                                <Input
+                                    id="answer"
+                                    value={answer}
+                                    placeholder="Enter flag here..."
+                                    onChange={(e) => setAnswer(e.target.value)}
                                 />
-                            ))}
-                        </div>
-                        <div className=""></div>
-                        <div className="flex flex-col">
-                            <Button
-                                onClick={() =>
-                                    challenge.instanceName && stopInstanceMutation.mutate(challenge.instanceName)
-                                }
-                                variant="destructive"
-                            >
-                                {stopInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Stop Instance
+
+                                <Button type="submit" className="w-full" disabled={submitFlagMutation.isPending}>
+                                    {stopInstanceMutation.isPending && (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    )}
+                                    Submit Flag
+                                </Button>
+                            </form>
+                        ) : isRunning ? (
+                            <>
+                                <div className="flex flex-col">
+                                    <Button
+                                        onClick={() =>
+                                            challenge.instanceName &&
+                                            stopInstanceMutation.mutate(challenge.instanceName)
+                                        }
+                                        variant="destructive"
+                                    >
+                                        {stopInstanceMutation.isPending && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
+                                        Stop Instance
+                                    </Button>
+                                </div>
+
+                                <form onSubmit={handleFlagSubmit} className="space-y-4">
+                                    <Input
+                                        id="answer"
+                                        value={answer}
+                                        placeholder="Enter flag here..."
+                                        onChange={(e) => setAnswer(e.target.value)}
+                                    />
+                                    <Button type="submit" className="w-full" disabled={submitFlagMutation.isPending}>
+                                        {stopInstanceMutation.isPending && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
+                                        Submit Flag
+                                    </Button>
+                                </form>
+                            </>
+                        ) : (
+                            <Button onClick={() => startInstanceMutation.mutate()} variant="default">
+                                {startInstanceMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Start Instance
                             </Button>
-                        </div>
-                        <form onSubmit={handleFlagSubmit} className="space-y-4">
-                            <Input
-                                id="answer"
-                                value={answer}
-                                placeholder="Enter flag here..."
-                                onChange={(e) => setAnswer(e.target.value)}
-                            ></Input>
-                            <Button type="submit" className="w-full" disabled={submitFlagMutation.isLoading}>
-                                {stopInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Submit Flag
-                            </Button>
-                        </form>
+                        )}
                     </>
-                ) : !challenge.isSolved ? (
-                    <Button onClick={() => startInstanceMutation.mutate()} variant="default">
-                        {startInstanceMutation.isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Start Instance
-                    </Button>
-                ) : (
-                    <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-                        <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 justify-center">
-                            <CheckCircle className="h-4 w-4" />
-                            <span>You've already solved this challenge!</span>
-                        </div>
-                    </div>
                 )}
             </DialogContent>
         </Dialog>

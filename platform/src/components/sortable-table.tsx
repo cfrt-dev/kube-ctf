@@ -7,7 +7,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { debounce } from "~/lib/utils";
 import { Badge } from "./ui/badge";
 
 type ChallengeRow = {

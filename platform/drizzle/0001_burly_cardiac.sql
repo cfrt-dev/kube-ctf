@@ -1,0 +1,1 @@
+ALTER TABLE "challenges" ADD COLUMN "deployType" "ChallengeType" DEFAULT 'Static' NOT NULL;

@@ -1,3 +1,5 @@
+import type { ChallengeDecayFunction, ChallengeType } from "./schema";
+
 export type UserType = "admin" | "user";
 
 export type Link = {
@@ -6,7 +8,7 @@ export type Link = {
     description?: string;
 };
 
-export type ContainerBase = {
+export type Container = {
     image: string;
     name?: string;
     allowExternalNetwork?: boolean;
@@ -31,34 +33,65 @@ export type ContainerBase = {
     };
 };
 
-export type ChallengeDeploy = {
-    type: "dynamic" | "static";
-    imagePullSecrets?: string[];
-    containers: ContainerBase[];
-};
-
 export type Challenge = {
     id: number;
     name: string;
+    flag: string;
     author: string;
     category: string;
     description?: string;
+    currentValue: number;
+    initialValue: number;
     hints?: string[];
-    value: {
-        currentValue: number;
-        type: "static" | "dynamic";
-        initialValue: number;
-        decayFunction?: {
-            type: "linear" | "logarithmic";
-            decay: number;
-            minimumValue: number;
-        };
-    };
+    value: ChallengeValue;
     dynamicFlag?: boolean;
     hidden?: boolean;
     files?: string[];
     deploy: ChallengeDeploy;
 };
+
+export type ChallengeDeploy = {
+    type: "Dynamic" | "Static";
+    imagePullSecrets: string[];
+    containers: Container[];
+};
+
+export type ChallengeValue = {
+    points: number;
+    initialPoints: number;
+} & (
+    | { type: "Static" }
+    | {
+          type: "Dynamic";
+          decayFunction: {
+              type: ChallengeDecayFunction;
+              decay: number;
+              minimum: number;
+          };
+      }
+);
+
+export interface ChallengeConfig {
+    name: string;
+    flag: string;
+    author: string | null;
+    category: string;
+    description: string | null;
+    hints: string[];
+    files: ChallengeFile[];
+    value: Omit<ChallengeValue, "points">;
+    dynamicFlag: boolean;
+    hidden: boolean;
+    deploy?: ChallengeDeploy;
+}
+
+export interface ChallengeFile {
+    name: string;
+    url: string;
+    isUploaded: boolean;
+    size?: number;
+    type?: string;
+}
 
 export type ChallengeDeployValues = {
     global: {
@@ -66,24 +99,24 @@ export type ChallengeDeployValues = {
         tlsCert: string;
     };
     labels: Record<string, string>;
-    containers: ContainerBase[];
+    containers: Container[];
     imagePullSecrets: string[];
 };
 
 export type PublicChallengeInfo = {
     id: number;
     name: string;
-    description: string | null;
+    description?: string | null;
     category: string;
-    author: string | null;
-    currentValue: number;
-    type: "static" | "dynamic";
+    author?: string | null;
+    value: Omit<ChallengeValue, "initialPoints">;
     hints: string[];
-    files: string[];
+    files: ChallengeFile[];
     links: Link[] | null;
     startTime?: Date;
     instanceName?: string;
     isSolved: boolean;
+    deployType: ChallengeType;
 };
 
 export type User = {

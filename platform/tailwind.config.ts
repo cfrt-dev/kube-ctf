@@ -66,6 +66,12 @@ export default {
                     border: "hsl(var(--sidebar-border))",
                     ring: "hsl(var(--sidebar-ring))",
                 },
+                shiki: {
+                    light: "var(--shiki-light)",
+                    "light-bg": "var(--shiki-light-bg)",
+                    dark: "var(--shiki-dark)",
+                    "dark-bg": "var(--shiki-dark-bg)",
+                },
             },
         },
     },

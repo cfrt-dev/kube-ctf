@@ -18,13 +18,14 @@ export default async function Page({
             id: challenges.id,
             name: challenges.name,
             category: challenges.category,
-            points: challenges.value,
+            points: challenges.points,
             solves: count(submissions.id),
             author: challenges.author,
             hidden: challenges.hidden,
         })
         .from(challenges)
         .leftJoin(submissions, and(eq(submissions.challenge_id, challenges.id), eq(submissions.type, true)))
+        .orderBy(challenges.id)
         .groupBy(challenges.id);
 
     return (

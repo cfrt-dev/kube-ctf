@@ -20,7 +20,7 @@
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": false,
+            "recommended": true,
             "complexity": {
                 "noUselessThisAlias": "error",
                 "noUselessTypeConstraint": "error",
@@ -44,7 +44,6 @@
             },
             "suspicious": {
                 "noEmptyBlockStatements": "error",
-                "noExplicitAny": "error",
                 "noExtraNonNullAssertion": "error",
                 "noMisleadingInstantiator": "error",
                 "noUnsafeDeclarationMerging": "error",

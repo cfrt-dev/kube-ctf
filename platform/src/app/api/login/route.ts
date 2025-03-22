@@ -36,7 +36,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { id, name, type } = user.value;
-    const { cookie } = createToken({ user_id: id, name, type });
+    const { cookie } = createToken({
+        user_id: id,
+        name,
+        type,
+        team_id: null,
+    });
 
     return NextResponse.redirect(new URL("/", req.url), {
         headers: { "Set-Cookie": cookie, Location: "/" },

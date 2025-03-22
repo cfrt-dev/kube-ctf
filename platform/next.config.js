@@ -2,8 +2,9 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-    output: "standalone",
+    reactStrictMode: true,
     crossOrigin: "anonymous",
+    // output: "standalone",
     eslint: {
         ignoreDuringBuilds: true,
     },

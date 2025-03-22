@@ -2,11 +2,11 @@
 
 import { and, eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { generateContainerLinks } from "~/lib/utils";
 import { db } from "~/server/db";
 import { challenges, runningChallenges, submissions } from "~/server/db/schema";
 import type { PublicChallengeInfo } from "~/server/db/types";
 import { parseJWT } from "~/server/utils";
-import { generateContainerLinks } from "./create";
 
 export async function getChallengeInfo(challengeId: number): Promise<PublicChallengeInfo | null> {
     const cookie = await cookies();
@@ -46,14 +46,17 @@ export async function getChallengeInfo(challengeId: number): Promise<PublicChall
         description: challenge.description,
         category: challenge.category,
         author: challenge.author,
-        currentValue: challenge.value,
-        type: challenge.type,
+        value: {
+            type: challenge.type,
+            points: challenge.points,
+        },
         hints: challenge.hints,
         files: challenge.files,
         links: null,
         startTime: undefined,
         instanceName: undefined,
         isSolved,
+        deployType: challenge.deployType,
     };
 
     if (runningChallenge !== null) {

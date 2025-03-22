@@ -1,13 +1,12 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { fromPromise } from "neverthrow";
 import { cookies } from "next/headers";
+import { generateContainerLinks, generateRandomString } from "~/lib/utils";
 import type { ChallengeDeploy, ChallengeDeployValues } from "~/server/db/types";
 import { db } from "../db";
 import { challenges, runningChallenges } from "../db/schema";
 import { parseJWT } from "../utils";
-import { generateContainerLinks, generateRandomString } from "./create";
 
 function getChallengeDeployValues(challenge: ChallengeDeploy): ChallengeDeployValues {
     const containerNames = new Set<string | null>();
@@ -56,13 +55,13 @@ export async function createInstance(challenge_id: number) {
 
     const row = await db.select().from(challenges).where(eq(challenges.id, challenge_id)).limit(1);
 
-    if (row.length === 0) {
+    if (row.length === 0 || row[0] === undefined) {
         throw new Error(`Challenge with ID ${challenge_id} not found`);
     }
 
-    const challenge = row[0]!;
+    const challenge = row[0];
     const name = generateRandomString(8);
-    const runningChallengePromise = db
+    const runningChallenge = await db
         .insert(runningChallenges)
         .values({
             id: name,
@@ -75,21 +74,18 @@ export async function createInstance(challenge_id: number) {
             start_time: runningChallenges.start_time,
         });
 
-    const runningChallenge = await fromPromise(runningChallengePromise, () => ({}));
-
-    if (runningChallenge.isErr()) {
-        return;
-    }
-
     await fetch(`https://challenge-manager.cfrt.dev/api/challenge?name=${name}`, {
         method: "POST",
         body: JSON.stringify(getChallengeDeployValues(challenge.deploy)),
     });
 
     const links = generateContainerLinks(challenge.deploy, name);
+    const instance = runningChallenge[0];
+
+    if (instance === undefined) return;
 
     return {
-        ...runningChallenge.value[0]!,
+        ...instance,
         links,
     };
 }

@@ -1,1 +1,0 @@
-ALTER TABLE "challenges" ADD COLUMN "category" varchar;
