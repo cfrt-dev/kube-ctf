@@ -58,7 +58,7 @@ impl ChallengeController {
                 r#type: dynamic_challenge.r#type,
                 decay: dynamic_challenge.decay,
                 minimum_value: dynamic_challenge.minimum,
-            })
+            });
         }
 
         tx.commit().await?;

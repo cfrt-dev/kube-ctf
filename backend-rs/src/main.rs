@@ -1,16 +1,23 @@
+#![deny(clippy::unwrap_used)]
+#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
+#![allow(async_fn_in_trait)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::must_use_candidate)]
+
 pub mod controllers;
-mod db;
-mod errors;
+pub mod db;
+pub mod errors;
 pub mod forms;
 pub mod jwt;
 pub mod macros;
-mod middlewares;
+pub mod middlewares;
 pub mod models;
 #[cfg(feature = "swagger")]
 mod openapi;
 pub mod providers;
-mod routes;
-mod utils;
+pub mod routes;
+pub mod utils;
 
 use std::sync::Arc;
 
@@ -67,8 +74,8 @@ async fn main() -> anyhow::Result<()> {
     let rdb = redis::Client::open(redis_url)?;
     let state = AppState {
         pool,
-        provider,
         rdb,
+        provider,
     };
 
     let router = Router::new()

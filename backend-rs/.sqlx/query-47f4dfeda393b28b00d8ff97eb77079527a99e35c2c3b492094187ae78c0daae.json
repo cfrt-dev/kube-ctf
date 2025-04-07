@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE files\n        SET challenge_id = $1\n        WHERE id = ANY($2)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "47f4dfeda393b28b00d8ff97eb77079527a99e35c2c3b492094187ae78c0daae"
+}

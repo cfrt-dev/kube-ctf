@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT challenge_id, flag\n        FROM running_challenges\n        WHERE id = $1 and user_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "challenge_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "flag",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "5dfb72cbfce2ea2640348bb17ac1d9900ef0cfa57bc489c2b01e15912cc30570"
+}

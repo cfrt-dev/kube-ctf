@@ -16,7 +16,7 @@ use crate::{
         models::{Claims, UserRole},
     },
     models::challenges::DeployChallengeResponse,
-    utils::{generate_container_links, generate_id},
+    utils::{generate_container_links, generate_id, not_found},
     AppState,
 };
 
@@ -79,7 +79,7 @@ pub async fn deploy_challenge(
 
     let mut id = generate_id(10);
     while rdb.exists::<_, bool>(&id).await.unwrap_or(false) {
-        id = generate_id(10)
+        id = generate_id(10);
     }
 
     let base_domain = "tasks.cfrt.dev";
@@ -106,11 +106,15 @@ pub async fn deploy_challenge(
         challenge_row.flag
     )
     .fetch_one(tx.as_mut())
-    .await
-    .map_err(|e| {
-        let _ = state.provider.delete_instnace(&id);
-        KubeCTFError::DatabaseError(e)
-    })?;
+    .await;
+
+    let row = match row {
+        Err(e) => {
+            let _ = state.provider.delete_instnace(&id).await;
+            return Err(KubeCTFError::DatabaseError(e));
+        }
+        Ok(row) => row,
+    };
 
     if let Err(e) = rdb.set::<_, _, ()>(&id, user_id).await {
         let _ = state.provider.delete_instnace(&id).await;
@@ -139,7 +143,7 @@ pub async fn delete_challenge(
     State(state): State<AppState>,
     Path(instance_id): Path<String>,
 ) -> Result<(), KubeCTFError> {
-    let Claims { user_id, .. } = claims_from_headers(&headers)?;
+    let Claims { user_id, role, .. } = claims_from_headers(&headers)?;
     let (mut rdb, mut conn) = try_join!(state.rdb.conn(), state.pool.conn())?;
     let mut tx = conn.begin().await?;
 
@@ -154,7 +158,7 @@ pub async fn delete_challenge(
     .await?
     .ok_or_else(|| KubeCTFError::NotFound("No running instance found with this ID.".into()))?;
 
-    if record.user_id != user_id {
+    if record.user_id != user_id && role != UserRole::Admin {
         return Err(KubeCTFError::Forbidden(
             "You are not allowed to delete this challenge.".into(),
         ));
@@ -177,8 +181,4 @@ pub async fn delete_challenge(
     tx.commit().await?;
 
     Ok(())
-}
-
-fn not_found() -> KubeCTFError {
-    KubeCTFError::NotFound("No challenge was found with that id.".into())
 }

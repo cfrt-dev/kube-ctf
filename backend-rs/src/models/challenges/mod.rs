@@ -22,7 +22,7 @@ pub struct DeployChallengeResponse {
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
-pub struct ChallengeFileForm {
+pub struct ChallengeFileModel {
     pub id: Uuid,
     pub name: String,
     pub url: String,
@@ -89,7 +89,7 @@ pub struct ChallengeModel {
     pub value: ChallengeValue,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub files: Vec<ChallengeFileForm>,
+    pub files: Vec<ChallengeFileModel>,
     pub deploy: Option<ChallengeDeploy>,
 }
 
@@ -104,6 +104,9 @@ pub struct PublicChallengeInfoModel {
 
     pub points: i32,
     pub solved: Option<bool>,
+
+    pub files: Vec<ChallengeFileModel>,
+    pub hints: Vec<String>,
 
     pub deploy: Option<DeployChallengeResponse>,
 }

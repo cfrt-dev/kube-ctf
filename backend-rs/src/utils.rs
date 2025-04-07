@@ -71,3 +71,7 @@ pub fn generate_container_links(
 
     links
 }
+
+pub fn not_found() -> KubeCTFError {
+    KubeCTFError::NotFound("No challenge was found with that id.".into())
+}

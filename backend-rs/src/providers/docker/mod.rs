@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 use crate::forms::challenges::Container;
 use async_trait::async_trait;
 
@@ -7,7 +8,7 @@ use super::Provider;
 pub struct DockerProvider;
 
 impl DockerProvider {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {}
     }
 }

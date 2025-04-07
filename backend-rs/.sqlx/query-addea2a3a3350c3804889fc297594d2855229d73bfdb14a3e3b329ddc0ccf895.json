@@ -1,0 +1,43 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO challenges(name, flag, author, category, description, type,\n                               points, initialPoints, hidden, dynamicFlag, hints,\n                               deploy)\n        VALUES ($1, $2, $3, $4, $5, $6,\n                $7, $8, $9, $10, $11, $12)\n        RETURNING id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        {
+          "Custom": {
+            "name": "challengetype",
+            "kind": {
+              "Enum": [
+                "Static",
+                "Dynamic"
+              ]
+            }
+          }
+        },
+        "Int4",
+        "Int4",
+        "Bool",
+        "Bool",
+        "VarcharArray",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "addea2a3a3350c3804889fc297594d2855229d73bfdb14a3e3b329ddc0ccf895"
+}

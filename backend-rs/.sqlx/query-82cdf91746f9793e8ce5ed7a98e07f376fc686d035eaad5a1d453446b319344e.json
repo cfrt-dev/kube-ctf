@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO dynamic_challenges(id, minimum, decay, type)\n            VALUES ($1, $2, $3, $4)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4",
+        {
+          "Custom": {
+            "name": "challengedecayfunction",
+            "kind": {
+              "Enum": [
+                "Linear",
+                "Logarithmic"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "82cdf91746f9793e8ce5ed7a98e07f376fc686d035eaad5a1d453446b319344e"
+}

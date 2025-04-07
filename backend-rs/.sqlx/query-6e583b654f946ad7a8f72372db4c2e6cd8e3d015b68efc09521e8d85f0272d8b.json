@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            c.flag,\n            c.hidden,\n            EXISTS (\n                SELECT 1 FROM submissions s\n                WHERE s.challenge_id = c.id\n                  AND s.user_id = $2\n                  AND s.is_correct = true\n            ) AS solved\n        FROM challenges c\n        WHERE c.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "flag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "hidden",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "solved",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "6e583b654f946ad7a8f72372db4c2e6cd8e3d015b68efc09521e8d85f0272d8b"
+}

@@ -1,0 +1,89 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT c.id, c.name, c.author, c.category, c.description, c.points,\n               c.deploy, c.hints, s.id IS NOT NULL AS solved,\n               rc.id AS \"instance_id?\",\n               rc.start_time AS \"start_time?\",\n               rc.end_time AS \"end_time?\"\n        FROM challenges c\n        LEFT JOIN submissions s ON s.challenge_id = c.id AND s.user_id = $1\n        LEFT JOIN running_challenges rc ON rc.challenge_id = c.id AND rc.user_id = $1\n        WHERE c.hidden = FALSE and c.id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "author",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "category",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "points",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "deploy",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "hints",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 8,
+        "name": "solved",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "instance_id?",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "start_time?",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 11,
+        "name": "end_time?",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      null,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "65fc40f8f2ce1ccdf485fcbf48dc1a5a2710e90b077ca506fc527a7049a51a09"
+}

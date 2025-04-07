@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH one_submission_per_challenge AS (\n            SELECT DISTINCT ON (challenge_id) *\n            FROM submissions\n            WHERE user_id = $1\n        )\n\n        SELECT c.id, c.name, c.author, c.category, c.description, c.points,\n               c.hints, s.id IS NOT NULL AS solved,\n               CASE\n                   WHEN rc.id IS NULL THEN NULL\n                   ELSE deploy\n               END,\n               rc.id AS instance_id, rc.start_time, rc.end_time\n        FROM challenges c\n        LEFT JOIN one_submission_per_challenge s ON s.challenge_id = c.id\n        LEFT JOIN running_challenges rc ON rc.challenge_id = c.id AND rc.user_id = $1\n        WHERE c.hidden = FALSE;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "author",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "category",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "points",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "hints",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 7,
+        "name": "solved",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "deploy",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "instance_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "start_time",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 11,
+        "name": "end_time",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null,
+      null,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "e7714c306bdf594ca4a95183c69c74c514ba0ae4ec61ef7995c6fce30ea2f162"
+}

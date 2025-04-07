@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, name, flag, author, category, description,\n                   type as \"type: ChallengeValueType\", points, initialPoints, hidden, dynamicFlag,\n                   hints, deploy\n            FROM challenges\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "flag",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "author",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "category",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "type: ChallengeValueType",
+        "type_info": {
+          "Custom": {
+            "name": "challengetype",
+            "kind": {
+              "Enum": [
+                "Static",
+                "Dynamic"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "points",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "initialpoints",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "hidden",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "dynamicflag",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "hints",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 12,
+        "name": "deploy",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "af60079fbd9ad45d19b1cdc4d22870c46de75d00ddd5e3ae82637fb599a3577f"
+}

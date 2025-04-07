@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 const JWT_EXPIRY_HOURS: i64 = 24;
 
-#[derive(Serialize, Deserialize, Clone, Debug, sqlx::Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, sqlx::Type, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(type_name = "UserType", rename_all = "lowercase")]
 pub enum UserRole {

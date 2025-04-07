@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT minimum, decay, type as \"type: ChallengeValueDecayFunctionType\"\n                FROM dynamic_challenges\n                WHERE id = $1\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "minimum",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "decay",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "type: ChallengeValueDecayFunctionType",
+        "type_info": {
+          "Custom": {
+            "name": "challengedecayfunction",
+            "kind": {
+              "Enum": [
+                "Linear",
+                "Logarithmic"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "de9e4389aff1fee04cde2db71af87dfb70ac1198f178880cb0174fe0068513ea"
+}

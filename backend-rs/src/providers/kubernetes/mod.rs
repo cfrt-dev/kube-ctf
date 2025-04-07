@@ -54,7 +54,7 @@ impl Provider for KubernetesProvider {
 }
 
 impl KubernetesProvider {
-    pub fn new(client: kube::Client) -> Self {
+    pub const fn new(client: kube::Client) -> Self {
         Self(client)
     }
 
@@ -124,7 +124,7 @@ impl KubernetesProvider {
                 error!("Failed to create deployment: {e}");
                 bail!(e)
             }
-        };
+        }
 
         Ok(())
     }
@@ -132,13 +132,13 @@ impl KubernetesProvider {
     async fn create_service(&self, container: &Container, instance_id: &str) -> anyhow::Result<()> {
         let client = self.0.clone();
         let services = Api::<Service>::default_namespaced(client);
-        let parts = [&container.name, instance_id]
+        let instance_name_parts = [&container.name, instance_id]
             .iter()
             .filter(|x| !x.is_empty())
             .copied()
             .collect::<Vec<_>>();
 
-        let instance_name = parts.join("-");
+        let instance_name = instance_name_parts.join("-");
 
         let ports = container
             .ports
@@ -183,7 +183,7 @@ impl KubernetesProvider {
                 error!("Failed to create service: {e}");
                 bail!(e)
             }
-        };
+        }
 
         Ok(())
     }
@@ -211,24 +211,24 @@ impl KubernetesProvider {
 
             match port.protocol {
                 Protocols::HTTP => {
-                    KubernetesProvider::create_ingress_route(
+                    Self::create_ingress_route(
                         client.clone(),
                         &instance_name,
                         &ingress_name,
                         instance_id,
                         port.number,
                     )
-                    .await?
+                    .await?;
                 }
                 Protocols::TCP => {
-                    KubernetesProvider::create_ingress_route_tcp(
+                    Self::create_ingress_route_tcp(
                         client.clone(),
                         &instance_name,
                         &ingress_name,
                         instance_id,
                         port.number,
                     )
-                    .await?
+                    .await?;
                 }
             }
         }
@@ -280,7 +280,7 @@ impl KubernetesProvider {
                 error!("Failed to create IngressRoute: {e}");
                 bail!(e)
             }
-        };
+        }
 
         Ok(())
     }
@@ -329,7 +329,7 @@ impl KubernetesProvider {
                 error!("Failed to create IngressRoute: {e}");
                 bail!(e)
             }
-        };
+        }
 
         Ok(())
     }
@@ -461,14 +461,14 @@ impl KubernetesProvider {
                 error!("Failed to create network policy: {e}");
                 bail!(e)
             }
-        };
+        }
 
         Ok(())
     }
 
     async fn cleanup(&self, instance_id: &str) -> anyhow::Result<()> {
         let client = self.0.clone();
-        let label = format!("kube-ctf.io/name={}", instance_id);
+        let label = format!("kube-ctf.io/name={instance_id}");
 
         let deployments: Api<Deployment> = Api::default_namespaced(client.clone());
         let services: Api<Service> = Api::default_namespaced(client.clone());
@@ -492,7 +492,7 @@ impl KubernetesProvider {
         let dirt = ingressroutetcps.delete_collection(&dp, &lp);
 
         if let Err(e) = try_join!(ddeploy, dsvc, dnetpols, dir, dirt) {
-            error!("Failed to delete resources - {}", e.to_string())
+            error!("Failed to delete resources - {}", e.to_string());
         }
 
         Ok(())

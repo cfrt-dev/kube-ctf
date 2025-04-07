@@ -73,6 +73,12 @@ pub struct Container {
 #[derive(Serialize, Deserialize)]
 pub struct ChallengeRequest(pub Vec<Container>);
 
+#[derive(Serialize, Deserialize)]
+pub struct FlagSubmitRequest {
+    pub instance_id: String,
+    pub flag: String,
+}
+
 pub fn validate_domain(
     containers: &[Container],
     instance_id: &str,
@@ -80,12 +86,13 @@ pub fn validate_domain(
 ) -> Result<(), KubeCTFError> {
     for container in containers {
         let container_name = &container.name;
-        for port in container.ports.iter() {
+        for port in &container.ports {
             let port_domain = port.domain.as_deref().unwrap_or("");
 
-            let port_domain_part = match port_domain.is_empty() {
-                true => port.number.to_string(),
-                false => port_domain.to_string(),
+            let port_domain_part = if port_domain.is_empty() {
+                port.number.to_string()
+            } else {
+                port_domain.to_string()
             };
 
             let mut parts = vec![&port_domain_part, container_name, instance_id];

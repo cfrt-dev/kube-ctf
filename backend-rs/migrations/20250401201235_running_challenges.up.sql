@@ -16,13 +16,11 @@ CREATE TABLE IF NOT EXISTS running_challenges
 CREATE TABLE IF NOT EXISTS submissions (
     id SERIAL PRIMARY KEY,
     user_id      INT       NOT NULL,
-    team_id      INT,
     challenge_id INT       NOT NULL,
     is_correct   BOOLEAN   NOT NULL DEFAULT FALSE,
     answer       VARCHAR   NOT NULL,
     submitted_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (challenge_id) REFERENCES challenges (id),
-    FOREIGN KEY (team_id) REFERENCES teams (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 

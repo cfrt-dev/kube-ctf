@@ -143,6 +143,6 @@ fn validate_containers(containers: &[Container]) -> Result<(), ValidationError> 
     Ok(())
 }
 
-fn default_hidden_status() -> bool {
+const fn default_hidden_status() -> bool {
     true
 }
