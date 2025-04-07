@@ -1,0 +1,51 @@
+{{- range $container := .Values.containers }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c.join" (list $.Release.Name $container.name) }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    "kube-ctf.io/name": {{ $.Release.Name }}
+    "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
+    {{- range $key, $value := $.Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      "kube-ctf.io/name": {{ $.Release.Name }}
+      "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
+      {{- range $key, $value := $.Values.labels }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+  template:
+    metadata:
+      labels:
+        "kube-ctf.io/name": {{ $.Release.Name }}
+        "kube-ctf.io/instance": {{ include "c.join" (list $.Release.Name $container.name) }}
+        {{- range $key, $value := $.Values.labels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      {{- if not (empty $.Values.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- range $.Values.imagePullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ $container.name | default "container" }}
+          image: {{ $container.image }}
+          imagePullPolicy: IfNotPresent
+          {{- if not (empty $container.envs) }}
+          env:
+          {{- range $container.envs }}
+            - name: {{ .name }}
+              value: {{ .value }}
+          {{- end }}
+          {{- end }}
+          resources:
+          {{- default (dict "requests" (dict "cpu" "100m" "memory" "128Mi")) $container.resources | toYaml | nindent 12 }}
+          {{- default (dict "requests" (dict "cpu" "100m" "memory" "128Mi")) $container.limits | toYaml | nindent 12 }}
+{{- end }}

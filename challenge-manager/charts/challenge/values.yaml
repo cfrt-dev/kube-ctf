@@ -1,7 +1,0 @@
-global:
-  baseDomain:
-  tlsCert:
-
-labels: {}
-containers: []
-imagePullSecrets: []

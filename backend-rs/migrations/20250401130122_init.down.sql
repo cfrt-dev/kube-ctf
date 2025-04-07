@@ -1,0 +1,8 @@
+-- Add down migration script here
+
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS challenges;
+DROP TABLE IF EXISTS teams CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TYPE IF EXISTS "UserType";
+DROP TYPE IF EXISTS "ChallengeType";

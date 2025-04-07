@@ -1,0 +1,7 @@
+node_modules
+.dockerignore
+compose.yaml
+.next
+Dockerfile
+Makefile
+README.md

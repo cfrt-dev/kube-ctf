@@ -26,9 +26,6 @@ files:
 deploy:
   type: Dynamic
 
-  imagePullSecrets:
-    - credentials
-
   containers:
     - image: nginx:alpine
       name: "nginx"

@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "global": {
+      "type": "object",
+      "properties": {
+        "baseDomain": {
+          "type": "string"
+        },
+        "tlsCert": {
+          "type": "string"
+        }
+      },
+      "required": ["baseDomain", "tlsCert"]
+    },
+    "containers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "allowExternalNetwork": {
+            "type": "boolean",
+            "default": false
+          },
+          "envs": {
+            "type": "array",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "value"]
+          },
+          "ports": {
+            "type": "array",
+            "properties": {
+              "number": {
+                "type": "number",
+                "minItems": 1,
+                "maxItems": 65535
+              },
+              "domain": {
+                "type": "string"
+              },
+              "protocol": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "const": "http"
+                  },
+                  {
+                    "const": "tcp"
+                  }
+                ],
+                "description": "Allowed values: 'http' and 'tcp'"
+              }
+            }
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "default": {
+              "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+              }
+            },
+            "properties": {
+              "requests": {
+                "type": "object",
+                "additionalProperties": false,
+                "default": {
+                  "cpu": "100m",
+                  "memory": "128Mi"
+                },
+                "properties": {
+                  "cpu": {
+                    "type": "string",
+                    "default": "100m"
+                  },
+                  "memory": {
+                    "type": "string",
+                    "default": "128Mi"
+                  }
+                }
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "default": {
+                  "cpu": "100m",
+                  "memory": "128Mi"
+                },
+                "properties": {
+                  "cpu": {
+                    "type": "string",
+                    "default": "100m"
+                  },
+                  "memory": {
+                    "type": "string",
+                    "default": "128Mi"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": ["image"]
+      }
+    },
+    "labels": {
+      "type": "object",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          "^.*$": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["containers"]
+}

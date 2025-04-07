@@ -1,0 +1,34 @@
+services:
+  platform:
+    image: cyberfather/platform
+    build: .
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/kube-ctf
+
+  db:
+    image: postgres:alpine
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kube-ctf
+
+  redis:
+    image: redis:7.2.7-alpine
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
